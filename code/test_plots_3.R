@@ -108,34 +108,22 @@ forown <- raster("gis/forown_binary_crop.tif")
 #----------------------------------------------------------------------------
 
 
- ########################################
- ## PLOT TESTING
- ########################################
- 
+########################################
+## PLOT TESTING
+########################################
+
 ##-------------
 ## forest ownership layer
 ##-------------
+plot(forown,
+     axes = FALSE,
+     box = FALSE,
+     legend = FALSE,
+     col = c("transparent", "grey85"))
 
-forown_theme <- rasterTheme(region = c("transparent", "grey85"))
+plot(states_sh,
+     add = TRUE)
 
-forown_plot <- levelplot(forown,
-                         
-                         # maximum pixels...set for lower resolution to avoid memory
-                         maxpixels = ncell(forown),
-                         
-                         # plot title
-                         main = list("Basal Area"), 
-                         
-                         # turn off margin plots
-                         margin = FALSE,
-                         
-                         # turn off scales and axis labels
-                         xlab=NULL, 
-                         ylab=NULL, 
-                         scales=list(draw=FALSE),
-                         
-                         # color settings
-                         par.settings = forown_theme)
 
 
 
@@ -146,45 +134,93 @@ forown_plot <- levelplot(forown,
 # basal area
 s832_ba <- raster("test_2/s832.tif") 
 
-
-ba_theme <- rasterTheme(region = rev(viridis(10)))
-
-ba <- levelplot(s832_ba,
-                     
-                     # maximum pixels...set for lower resolution to avoid memory
-                     maxpixels = 1e5,
-                
-                     par.settings = ba_theme,
-                     
-                     #plot title
-                     main = list("Basal Area"), 
-                     
-                     # turn off margin plots
-                     margin = FALSE,
-                      
-                     # legend title
-                     colorkey = list(title = expression(atop(m^2, " ")),
-                                     title.gpar = list(cex = 0.9)),
-                     
-                     #turn off axis labels
-                     xlab=NULL, 
-                     ylab=NULL, 
-                     scales=list(draw=FALSE),
-                     
-                     # change color scale
-                     pretty = TRUE) +
-            
-            # states outline
-            layer(sp.polygons(states_sh))
+ba_cols <- rev(viridis(256))
 
 
-ba_plot <- ba + as.layer(forown_plot, under = TRUE)
+par(mar = c(0,0,0,0))
+plot(r,
+     
+     #turn off plot features
+     axes = FALSE,
+     box = FALSE,
+     
+     # title
+     main = "Basal Area",
+     
+     # colors
+     col = ba_cols,
+     
+     #legend properties
+     legend.args=list(text=expression(m^2), line = 0.4, cex=1, adj = -1),
+     axis.args = list(cex.axis = 1,
+                      mgp = c(3,0.5,0),
+                      tck = -0.25),
+     
+     legend.width = 1,
+     legend.shrink = 0.4)
 
-pdf(file = "figures/s832_ba.pdf",
+
+
+
+
+
+pdf(file = "figures_base/s832_ba.pdf",
     height = 4,
     width = 4)
-ba_plot
+
+par(mar = c(0,0,0,1),
+    oma = c(0,0,0,0),
+    cex = 0.8)
+
+plot(forown,
+     
+     # total pixels to plot
+     # maxpixels = ncell(forown),
+     
+     # turn off plot features
+     axes = FALSE,
+     box = FALSE,
+     legend = FALSE,
+     
+     # colors
+     col = c("transparent", "grey85"))
+
+
+
+plot(s832_ba,
+     
+     #turn off plot features
+     axes = FALSE,
+     box = FALSE,
+     
+     # colors
+     col = ba_cols,
+     
+     #legend properties
+     legend.shrink = 0.4,
+     legend.width = 1,
+     
+     # legend title
+     legend.args=list(text=expression(m^2), 
+                      line = 0,
+                      cex = 0.8,
+                      adj = 0.5),
+     
+     # legend labels
+     axis.args = list(cex.axis = 0.8,
+                      mgp = c(2.5,0.25,0),
+                      tck = -0.25),
+     
+     add = TRUE)
+
+
+plot(states_sh,
+     add = TRUE)
+
+title("Basal Area", line = -5, cex = 0.8)
+
 dev.off()
+
 
 ##-------------
 ## proportional basal area
@@ -193,44 +229,62 @@ dev.off()
 # proportion basal area
 s832_prop <- raster("test_2/s832_proportion.tif") 
 
-prop_ba_theme <- rasterTheme(region = rev(magma(10)))
+prop_ba_cols <- rev(magma(256))
 
-prop_ba <- levelplot(s832_prop,
-                     
-                     # maximum pixels...set for lower resolution to avoid memory
-                     maxpixels = 1e5,
-                     
-                     par.settings = prop_ba_theme,
-                     
-                     #plot title
-                     main = list("Proportional Basal Area"), 
-                     
-                     # turn off margin plots
-                     margin = FALSE,
-                     
-                     # legend title
-                     colorkey = list(title = "%",
-                       # title = expression(atop("%", "")),
-                                     title.gpar = list(cex = 0.9)),
-                     
-                     #turn off axis labels
-                     xlab=NULL, 
-                     ylab=NULL, 
-                     scales=list(draw=FALSE),
-                     
-                     # change color scale
-                     pretty = TRUE) +
-  
-  # states outline
-  layer(sp.polygons(states_sh))
-
-
-prop_ba_plot <- prop_ba + as.layer(forown_plot, under = TRUE)
-
-pdf(file = "figures/s832_prop_ba.pdf",
+pdf(file = "figures_base/s832_prop_ba.pdf",
     height = 4,
     width = 4)
-prop_ba_plot
+
+par(mar = c(0,0,0,1),
+    oma = c(0,0,0,0),
+    cex = 0.8)
+
+plot(forown,
+     
+     # total pixels to plot
+     # maxpixels = ncell(forown),
+     
+     # turn off plot features
+     axes = FALSE,
+     box = FALSE,
+     legend = FALSE,
+     
+     # colors
+     col = c("transparent", "grey85"))
+
+
+
+plot(s832_prop,
+     
+     #turn off plot features
+     axes = FALSE,
+     box = FALSE,
+     
+     # colors
+     col = prop_ba_cols,
+     
+     #legend properties
+     legend.shrink = 0.4,
+     legend.width = 1,
+     
+     # legend title
+     legend.args=list(text="%", 
+                      line = 0,
+                      cex = 0.8),
+     
+     # legend labels
+     axis.args = list(cex.axis = 0.8,
+                      mgp = c(2.5,0.25,0),
+                      tck = -0.25),
+     
+     add = TRUE)
+
+
+plot(states_sh,
+     add = TRUE)
+
+title("Proportional Basal Area", line = -5, cex = 0.8)
+
 dev.off()
 
 
@@ -337,11 +391,18 @@ dev.off()
 
 
 ##-------------
-## reduction
+## reduction...look at zlim in raster::plot for same scale
 ##-------------
 
 # color palette and breaks for creating categorical variable
-red_col_pal <- brewer_pal(palette = "RdYlBu")(6)
+red_col_pal <- rev(brewer_pal(palette = "RdYlBu")(6))
+
+
+s832_n_growth_red <- raster("test_2/s832_proportion_exc_n_growth_n_growth_reduction.tif")                         
+
+
+plot(s832_n_growth_red)
+
 red_theme <- rasterTheme(region=rev(red_col_pal))
 red_breaks <- c(0, 0.01,0.05, 0.1, 0.2, Inf)
 red_df <- data.frame(ID = 1:6, 
@@ -429,11 +490,6 @@ pdf(file = "figures/s832_reduction.pdf",
     width = 8)
 red_plot
 dev.off()
-
-
-
-
-
 
 
 
