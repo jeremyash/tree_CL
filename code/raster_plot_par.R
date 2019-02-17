@@ -124,17 +124,27 @@ pdf(file = "figures_base/exc_test.pdf",
     height = 5,
     width = 8)
 
-par(mfrow=c(2,2),mar=c(0,0,1,1),oma=c(0,0,0,8))
-plot(states_sh, axes = FALSE, box = FALSE, main = "Exceedance/reduction", col = red_cols, breaks = red_breaks, legend = FALSE)
-plot(states_sh, axes = FALSE, box = FALSE, main = "Exceedance/reduction", col = red_cols, breaks = red_breaks, legend = FALSE)
-plot(states_sh, axes = FALSE, box = FALSE, main = "Exceedance/reduction", col = red_cols, breaks = red_breaks, legend = FALSE)
-plot(states_sh, axes = FALSE, box = FALSE, main = "Exceedance/reduction", col = red_cols, breaks = red_breaks, legend = FALSE)
+
+par(mfrow=c(2,2),mar=c(0,0,0,0),oma=c(0,0,2,8))
+plot(states_sh, axes = FALSE, box = FALSE, col = red_cols, breaks = red_breaks, legend = FALSE)
+title("Growth - N", line = -2, cex = 0.8)
+
+plot(states_sh, axes = FALSE, box = FALSE, col = red_cols, breaks = red_breaks, legend = FALSE)
+title("Survival - N", line = -2, cex = 0.8)
+
+plot(states_sh, axes = FALSE, box = FALSE, col = red_cols, breaks = red_breaks, legend = FALSE)
+title("Growth - S", line = -2, cex = 0.8)
+
+plot(states_sh, axes = FALSE, box = FALSE,  col = red_cols, breaks = red_breaks, legend = FALSE)
+title("Survival  -S", line = -2, cex = 0.8)
+
+mtext("Proportion Reduction in:", side = 3, line = -0.5, cex = 1.5, font = 2, outer = TRUE)
 
 par(mfrow=c(1,1),new=FALSE, oma=c(0,0,0,0))
 
 legend(
-  x = 1750000,
-  y = 2750000,
+  x = 1550000,
+  y = 2500000,
   ncol = 1,
   
   # legend colors and sizes
@@ -155,23 +165,18 @@ legend(
   # inset = -.075,
   # y.intersp = 1,
   # x.intersp = 0.25,
-  cex = 1.5,
+  cex = 1.3,
   text.width = 30,
   xpd = NA)
+
+
+
+
+
 
 dev.off()
 
 
 
-
-
-
-plot(z,legend.only=TRUE ,legend.shrink=1, legend.width=1, zlim=c(0, 1),
-     axis.args=list(at=c(0.01, 0.05, 0.1, 0.2,  3), labels=red_levels,col=red_cols),
-     legend.args=list(text='Whatever',"bottom", font=2, line=2.3))
-
-red_raster <- raster(nrows = 2, ncols = 4, vals = c(0,1,2,3,4,5,6,6))
-plot(red_raster,legend.only=TRUE ,legend.shrink=1, legend.width=1, zlim=c(0, 1), col = red_cols,
-     axis.args=list(at=c(0.5, 1.5, 2.5, 3.5, 4.5, 5.5), labels=red_levels)) 
 
 
