@@ -19,6 +19,7 @@ library(viridis)
 library(extrafont)
 library(gtable)
 library(grid)
+library(RColorBrewer)
 #----------------------------------------------------------------------------
 
 
@@ -42,15 +43,21 @@ plot(r, legend.only=TRUE, col=topo.colors(100),
 
 # basal area and prop basal area
 
-par(mar = c(0,0,0,0))
-plot(r,
+
+png(file = "figures_base/ba_prop_test.png",
+    height = 5,
+    width = 8.5,
+    units = "in",
+    res = 300)
+par(mar = c(0,0,0,0), mfrow = c(1,2), oma = c(0,0,2,0))
+plot(states_sh,
      
      #turn off plot features
      axes = FALSE,
      box = FALSE,
      
      # title
-     main = "Basal Area",
+     # main = "Basal Area",
      
      # colors
      col = ba_cols,
@@ -63,66 +70,97 @@ plot(r,
      
      legend.width = 1,
      legend.shrink = 0.4)
+title("Basal Area", line = -2, cex = 0.8)
 
-
-
-
-# reduction and exceedance plots
-
-z <- raster(nrows=5, ncols=5, vals=seq(0,1,l=25))
-plot(z)
-
-
-# reduction colors, breaks and levels/labels
-red_cols <- rev(brewer_pal(palette = "RdYlBu")(6))
-red_breaks <- c(0, 0.01,0.05, 0.1, 0.2, 3)
-red_levels <- c("0",  
-                "0-0.01",
-               "0.01-0.05",
-               "0.05-0.1", 
-               "0.1-0.2",
-               ">0.2")
-plot(z,
+plot(states_sh,
      
      #turn off plot features
      axes = FALSE,
      box = FALSE,
      
      # title
-     main = "Exceedance/reduction",
+     # main = "Basal Area",
      
      # colors
-     col = red_cols,
+     col = ba_cols,
      
-     # breaks
-     breaks = red_breaks,
+     #legend properties
+     legend.args=list(text=expression(m^2), line = 0.4, cex=1, adj = -1),
+     axis.args = list(cex.axis = 1,
+                      mgp = c(3,0.5,0),
+                      tck = -0.25),
      
-     legend = FALSE)
-
-
-legend(
-  x = "right",
-  ncol = 1,
-  legend = rev(red_levels),
-  fill = rev(red_cols),
-  # title = "%",
-  bty = "n",
-  # inset = -0.175,
-  y.intersp = 0.5,
-  x.intersp = 0.25,
-  cex = 3,
-  text.width = 20
-
-)
-
-
-###CLOSEST ATTEMPT SO FAR
-# window()
-
-
-pdf(file = "figures_base/exc_test.pdf",
+     legend.width = 1,
+     legend.shrink = 0.4)
+title("Proportional Basal Area", line = -2, cex = 0.8)
+mtext("Species", side = 3, line = -0.5, cex = 2, font = 3, outer = TRUE)
+dev.off()
+# 
+# 
+# 
+# 
+# #----------------------------------------------------------------------------
+# 
+# # reduction and exceedance plots
+# 
+# z <- raster(nrows=5, ncols=5, vals=c(seq(0,1,l=22),2,3, 0.009))
+# plot(z)
+# 
+# 
+# # reduction colors, breaks and levels/labels
+# red_cols <- rev(brewer_pal(palette = "RdYlBu")(6))
+# display.brewer.pal(6, "RdYlBu")
+# red_breaks <- c(0, 0.000001, 0.01,0.05, 0.1, 0.2, 3.5)
+# red_levels <- c("0",  
+#                 "0-0.01",
+#                "0.01-0.05",
+#                "0.05-0.1", 
+#                "0.1-0.2",
+#                ">0.2")
+# plot(z,
+#      
+#      #turn off plot features
+#      axes = FALSE,
+#      box = FALSE,
+#      
+#      # title
+#      main = "Exceedance/reduction",
+#      
+#      # colors
+#      col = red_cols,
+#      
+#      # breaks
+#      breaks = red_breaks,
+#      
+#      # total range of colors
+#      zlim = c(0, 3.5))
+# 
+# 
+# legend(
+#   x = "right",
+#   ncol = 1,
+#   legend = rev(red_levels),
+#   fill = rev(red_cols),
+#   # title = "%",
+#   bty = "n",
+#   # inset = -0.175,
+#   y.intersp = 0.5,
+#   x.intersp = 0.25,
+#   cex = 3,
+#   text.width = 20
+# 
+# )
+# 
+# 
+# ###CLOSEST ATTEMPT SO FAR
+# # window()
+# 
+# 
+png(file = "figures_base/exc_test.png",
     height = 5,
-    width = 8)
+    width = 8,
+    units = "in",
+    res = 300)
 
 
 par(mfrow=c(2,2),mar=c(0,0,0,0),oma=c(0,0,2,8))
