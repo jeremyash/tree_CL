@@ -167,9 +167,9 @@ prop_ba_cols <- rev(magma(256))
 # multipanel plot 
 pdf(file = "figures_base/ba_prop_s832.pdf",
     height = 5,
-    width = 9)
+    width = 10)
 
-par(mar = c(0,0,0,2), 
+par(mar = c(0,0,0,5), 
     mfrow = c(1,2), 
     oma = c(0,0,2,0),
     cex = 0.8)
@@ -199,17 +199,17 @@ plot(s832_ba,
      col = ba_cols,
      
      #legend properties
-     legend.shrink = 0.4,
-     legend.width = 1,
+     # legend.shrink = 0.4,
+     legend.width = 3,
      
      # legend title
      legend.args=list(text=expression(m^2), 
                       line = 0,
-                      cex = 0.8,
+                      cex = 1.1,
                       adj = 0.5),
      
      # legend labels
-     axis.args = list(cex.axis = 0.8,
+     axis.args = list(cex.axis = 1.1,
                       mgp = c(2.5,0.25,0),
                       tck = -0.25),
      
@@ -245,16 +245,16 @@ plot(s832_prop,
      col = prop_ba_cols,
      
      #legend properties
-     legend.shrink = 0.4,
-     legend.width = 1,
+     # legend.shrink = 0.4,
+     legend.width = 3,
      
      # legend title
      legend.args=list(text="%", 
                       line = 0,
-                      cex = 0.8),
+                      cex = 1.1),
      
      # legend labels
-     axis.args = list(cex.axis = 0.8,
+     axis.args = list(cex.axis = 1.1,
                       mgp = c(2.5,0.25,0),
                       tck = -0.25),
      
@@ -423,7 +423,7 @@ red_exc_plot(red_stack[[3]], "Growth - S")
 red_exc_plot(red_stack[[4]], "Survival - S")
 
 # add in the title
-mtext("Proportion Reduction in:", side = 3, line = -0.5, cex = 1.5, font = 2, outer = TRUE)
+mtext("Proportion Reduction in:", side = 3, line = -0.5, cex = 1.2, font = 2, outer = TRUE)
 
 # add legend for all plots
 par(mfrow=c(1,1),new=FALSE, oma=c(0,0,0,0), mgp = c(2.5,0.25,0))
