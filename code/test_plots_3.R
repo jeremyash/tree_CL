@@ -115,15 +115,18 @@ red_exc_plot <- function(RASTER, TITLE) {
 ## load gis and raster data
 ########################################
 
-# base states map
-states_sh <- readOGR("gis/states")
-states_sh <- spTransform(states_sh, CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0"))
-# states_df <- broom::tidy(states_sh)
-# states_sf <- st_as_sf(states_sh)
-
 #forown
 # forown <- raster("gis/forown.tif")
 forown <- raster("gis/forown_binary_crop.tif") 
+new_crs <- proj4string(forown)
+
+# base states map
+states_sh <- readOGR("gis/states")
+states_sh <- spTransform(states_sh, new_crs)
+# states_df <- broom::tidy(states_sh)
+# states_sf <- st_as_sf(states_sh)
+
+
 
 
 
@@ -158,7 +161,6 @@ s832_ba <- raster("test_2/s832.tif")
 s832_prop <- raster("test_2/s832_proportion.tif") 
 
 
-
 # plot pars
 ba_cols <- rev(viridis(256))
 prop_ba_cols <- rev(magma(256))
@@ -169,7 +171,7 @@ pdf(file = "figures_base/ba_prop_s832.pdf",
     height = 5,
     width = 10)
 
-par(mar = c(0,0,0,5), 
+par(mar = c(0,0,0,0), 
     mfrow = c(1,2), 
     oma = c(0,0,2,0),
     cex = 0.8)
@@ -194,30 +196,43 @@ plot(s832_ba,
      #turn off plot features
      axes = FALSE,
      box = FALSE,
+     legend = FALSE,
+     
+     # colors
+     col = ba_cols,
+     add = TRUE)
+     
+
+plot(states_sh,
+     add = TRUE)
+
+plot(s832_ba,
      
      # colors
      col = ba_cols,
      
      #legend properties
      # legend.shrink = 0.4,
-     legend.width = 3,
+     legend.only = TRUE,
+     horizontal = TRUE,
+     # legend.width = 1.5,
+     # cex = 1.2,
+     smallplot = c(0.1,0.9,0.1,0.15),
      
      # legend title
      legend.args=list(text=expression(m^2), 
-                      line = 0,
+                      line = 0.5,
+                      side = 2,
                       cex = 1.1,
-                      adj = 0.5),
+                      las = 1),
      
      # legend labels
      axis.args = list(cex.axis = 1.1,
-                      mgp = c(2.5,0.25,0),
+                      mgp = c(2.5,0.5,0),
                       tck = -0.25),
      
      add = TRUE)
 
-
-plot(states_sh,
-     add = TRUE)
 
 title("Basal Area", line = -5, cex = 0.8)
 
@@ -240,29 +255,43 @@ plot(s832_prop,
      #turn off plot features
      axes = FALSE,
      box = FALSE,
+     legend = FALSE,
      
      # colors
      col = prop_ba_cols,
-     
-     #legend properties
-     # legend.shrink = 0.4,
-     legend.width = 3,
-     
-     # legend title
-     legend.args=list(text="%", 
-                      line = 0,
-                      cex = 1.1),
-     
-     # legend labels
-     axis.args = list(cex.axis = 1.1,
-                      mgp = c(2.5,0.25,0),
-                      tck = -0.25),
-     
      add = TRUE)
 
 
 plot(states_sh,
      add = TRUE)
+
+plot(s832_prop,
+
+     # colors
+     col = prop_ba_cols,
+     
+     #legend properties
+     # legend.shrink = 0.4,
+     legend.only = TRUE,
+     horizontal = TRUE,
+     # legend.width = 1.5,
+     # cex = 1.2,
+     smallplot = c(0.1,0.9,0.1,0.15),
+     
+     # legend title
+     legend.args=list(text="%", 
+                      line = 0.5,
+                      side = 2,
+                      cex = 1.1,
+                      las = 1),
+     
+     # legend labels
+     axis.args = list(cex.axis = 1.1,
+                      mgp = c(2.5,0.5,0),
+                      tck = -0.25),
+     
+     add = TRUE)
+
 
 title("Proportional Basal Area", line = -5, cex = 0.8)
 
