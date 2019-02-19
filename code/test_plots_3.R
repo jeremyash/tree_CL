@@ -21,6 +21,7 @@ library(extrafont)
 library(gtable)
 library(grid)
 library(rasterVis)
+library(RColorBrewer)
 
 #----------------------------------------------------------------------------
 
@@ -35,22 +36,12 @@ library(rasterVis)
 # Create an empty raster for when there one is not processed via Python
 # s832_n_growth_exc <- raster("test_2/s832_proportion_exc_n_growth.tif")
 # empty_raster <- reclassify(s832_n_growth_exc, cbind(0, 10, NA))
-# empty_raster <- raster::cut(empty_raster,
-#                             breaks = exc_breaks,
-#                             include.lowest = TRUE)
-# levels(empty_raster) <- exc_df
 # saveRDS(empty_raster, "test_2/empty_raster_exceedance.RDS")
 
 # function to check if file exists and read in file; else is empty raster
-read_cut_exc_raster <- function(FILE) {
+read_exc_raster <- function(FILE) {
   if(file.exists(FILE) == TRUE){
-    dat <- raster(FILE)
-    dat <- raster::cut(dat, 
-                       breaks = exc_breaks,
-                       include.lowest = TRUE)
-    levels(dat) <- exc_df
-    return(dat)
-    
+    raster(FILE)
   } else {
     readRDS("test_2/empty_raster_exceedance.RDS")
   }
@@ -62,28 +53,59 @@ read_cut_exc_raster <- function(FILE) {
 ##-------------
 
 # # Create an empty raster for when there one is not processed via Python
-# s832_n_growth_red <- read_raster_fun("test_2/s832_proportion_exc_n_growth_n_growth_reduction.tif")
+# s832_n_growth_red <- raster("test_2/s832_proportion_exc_n_growth_n_growth_reduction.tif")
 # empty_raster <- reclassify(s832_n_growth_red, cbind(0, 10, NA))
-# empty_raster <- raster::cut(empty_raster, 
-#                             breaks = red_breaks,
-#                             include.lowest = TRUE)
-# levels(empty_raster) <- red_df
 # saveRDS(empty_raster, "test_2/empty_raster_reduction.RDS")
 
 # function to check if file exists and read in file; else is empty raster
-read_cut_red_raster <- function(FILE) {
+read_red_raster <- function(FILE) {
   if(file.exists(FILE) == TRUE){
-    dat <- raster(FILE)
-    dat <- raster::cut(dat, 
-                       breaks = red_breaks,
-                       include.lowest = TRUE)
-    levels(dat) <- red_df
-    return(dat)
-    
+    raster(FILE)
   } else {
     readRDS("test_2/empty_raster_reduction.RDS")
   }
 }
+
+
+##-------------
+## plotting function for red/exc rasters
+##-------------
+
+red_exc_plot <- function(RASTER, TITLE) {
+  
+  # forest ownership
+  plot(forown,
+       
+       # total pixels to plot
+       # maxpixels = ncell(forown),
+       
+       # turn off plot features
+       axes = FALSE,
+       box = FALSE,
+       legend = FALSE,
+       
+       # colors
+       col = c("transparent", "grey85"))
+  
+  # plot reduction/exceedance raster
+  plot(RASTER, 
+       axes = FALSE, 
+       box = FALSE, 
+       col = red_cols, 
+       breaks = red_breaks, 
+       legend = FALSE,
+       add = TRUE)
+  
+  # plot states
+  plot(states_sh,
+       add = TRUE)
+  
+  # add panel title
+  title(TITLE, line = -2, cex = 0.8)
+}
+
+
+
 
 #----------------------------------------------------------------------------
 
@@ -115,63 +137,45 @@ forown <- raster("gis/forown_binary_crop.tif")
 ##-------------
 ## forest ownership layer
 ##-------------
-plot(forown,
-     axes = FALSE,
-     box = FALSE,
-     legend = FALSE,
-     col = c("transparent", "grey85"))
-
-plot(states_sh,
-     add = TRUE)
-
+# plot(forown,
+#      axes = FALSE,
+#      box = FALSE,
+#      legend = FALSE,
+#      col = c("transparent", "grey85"))
+# 
+# plot(states_sh,
+#      add = TRUE)
+# 
 
 
 
 ##-------------
-## basal area
+## basal area and proportional basal area
 ##-------------
 
-# basal area
+# rasters
 s832_ba <- raster("test_2/s832.tif") 
+s832_prop <- raster("test_2/s832_proportion.tif") 
 
+
+
+# plot pars
 ba_cols <- rev(viridis(256))
+prop_ba_cols <- rev(magma(256))
 
 
-par(mar = c(0,0,0,0))
-plot(r,
-     
-     #turn off plot features
-     axes = FALSE,
-     box = FALSE,
-     
-     # title
-     main = "Basal Area",
-     
-     # colors
-     col = ba_cols,
-     
-     #legend properties
-     legend.args=list(text=expression(m^2), line = 0.4, cex=1, adj = -1),
-     axis.args = list(cex.axis = 1,
-                      mgp = c(3,0.5,0),
-                      tck = -0.25),
-     
-     legend.width = 1,
-     legend.shrink = 0.4)
+# multipanel plot 
+pdf(file = "figures_base/ba_prop_s832.pdf",
+    height = 5,
+    width = 9)
 
-
-
-
-
-
-pdf(file = "figures_base/s832_ba.pdf",
-    height = 4,
-    width = 4)
-
-par(mar = c(0,0,0,1),
-    oma = c(0,0,0,0),
+par(mar = c(0,0,0,2), 
+    mfrow = c(1,2), 
+    oma = c(0,0,2,0),
     cex = 0.8)
 
+
+# basal area
 plot(forown,
      
      # total pixels to plot
@@ -184,8 +188,6 @@ plot(forown,
      
      # colors
      col = c("transparent", "grey85"))
-
-
 
 plot(s832_ba,
      
@@ -219,26 +221,7 @@ plot(states_sh,
 
 title("Basal Area", line = -5, cex = 0.8)
 
-dev.off()
-
-
-##-------------
-## proportional basal area
-##-------------
-
-# proportion basal area
-s832_prop <- raster("test_2/s832_proportion.tif") 
-
-prop_ba_cols <- rev(magma(256))
-
-pdf(file = "figures_base/s832_prop_ba.pdf",
-    height = 4,
-    width = 4)
-
-par(mar = c(0,0,0,1),
-    oma = c(0,0,0,0),
-    cex = 0.8)
-
+# proportional basal area
 plot(forown,
      
      # total pixels to plot
@@ -251,8 +234,6 @@ plot(forown,
      
      # colors
      col = c("transparent", "grey85"))
-
-
 
 plot(s832_prop,
      
@@ -285,6 +266,8 @@ plot(states_sh,
 
 title("Proportional Basal Area", line = -5, cex = 0.8)
 
+# species title
+mtext("Quercus prinus", side = 3, line = -0.5, cex = 2, font = 3, outer = TRUE)
 dev.off()
 
 
@@ -394,48 +377,23 @@ dev.off()
 ## reduction...look at zlim in raster::plot for same scale
 ##-------------
 
-# color palette and breaks for creating categorical variable
-red_col_pal <- rev(brewer_pal(palette = "RdYlBu")(6))
+# rasters
 
+s832_n_growth_red <- read_red_raster("test_2/s832_proportion_exc_n_growth_n_growth_reduction.tif")                
+s832_n_survival_red <- read_red_raster("test_2/s832_proportion_exc_n_survival_n_survival_reduction.tif")
+s832_s_growth_red <- read_red_raster("test_2/s832_proportion_exc_s_growth_s_growth_reduction.tif") 
+s832_s_survival_red <- read_red_raster("test_2/s832_proportion_exc_s_survival_s_survival_reduction.tif")
 
-s832_n_growth_red <- raster("test_2/s832_proportion_exc_n_growth_n_growth_reduction.tif")                         
-
-
-plot(s832_n_growth_red)
-
-red_theme <- rasterTheme(region=rev(red_col_pal))
-red_breaks <- c(0, 0.01,0.05, 0.1, 0.2, Inf)
-red_df <- data.frame(ID = 1:6, 
-                     red_levels = c("0", 
-                                    "0-0.01",
-                                    "0.01-0.05",
-                                    "0.05-0.1", 
-                                    "0.1-0.2",
-                                    ">0.2"))
-
-
-# n growth
-s832_n_growth_red <- read_cut_red_raster("test_2/s832_proportion_exc_n_growth_n_growth_reduction.tif")                         
-# n survival
-s832_n_survival_red <- read_cut_red_raster("test_2/s832_proportion_exc_n_survival_n_survival_reduction.tif")
-
-# s growth
-s832_s_growth_red <- read_cut_red_raster("test_2/s832_proportion_exc_s_growth_s_growth_reduction.tif") 
-
-# s survival
-s832_s_survival_red <- read_cut_red_raster("test_2/s832_proportion_exc_s_survival_s_survival_reduction.tif")
-
-
-# create a raster stack
+# stack and name rasters
 red_stack <- stack(s832_n_growth_red,
                    s832_n_survival_red,
                    s832_s_growth_red,
                    s832_s_survival_red)
 
-names(red_stack) <- c("Proportion Reduction in Growth - N",
-                      "Proportion Reduction in Survival - N",
-                      "Proportion Reduction in Growth - S",
-                      "Proportion Reduction in Survival - S")
+names(red_stack) <- c("Growth_N",
+                      "Survival_N",
+                      "Growth_S",
+                      "Survival_S")
 
 # remove input files
 rm(s832_n_growth_red,
@@ -444,63 +402,61 @@ rm(s832_n_growth_red,
    s832_s_survival_red)
 
 
-
-# create base plot
-red <- levelplot(red_stack,
-          
-          # maximum pixels...set for lower resolution to avoid memory
-          maxpixels = 1e5,
-          
-          #plot title
-          main = list("Proportion Reduction in:"), 
-          
-          # panel titles
-          names.attr = c("Growth - N",
-            "Survival - N",
-            "Growth - S",
-            "Survival - S"),
-          
-          # par settings
-          par.settings = red_theme,
-          
-          # turn off margin plots
-          margin = FALSE,
-          
-          # legend title
-          colorkey = list(title = "%"),
-          
-          #turn off axis labels
-          xlab=NULL, 
-          ylab=NULL, 
-          scales=list(draw=FALSE),
-          
-          # change color scale
-          pretty = TRUE) +
-  
-  # states outline
-  layer(sp.polygons(states_sh))
+# color palette and breaks for creating categorical variable
+red_cols <- rev(brewer_pal(palette = "RdYlBu")(6))
+red_breaks <- c(0, 0.000001, 0.01, 0.05, 0.1, 0.2, 3.5)
+red_labels <- c("0", "0-0.01", "0.01-0.05", "0.05-0.1", "0.1-0.2", ">0.2")
 
 
-# add in forest ownership
-red_plot <- red + as.layer(forown_plot, under = TRUE)
-
-
-pdf(file = "figures/s832_reduction.pdf",
-    height = 8,
+# multipanel reduction plots
+pdf(file = "figures_base/exc_test.pdf",
+    height = 5,
     width = 8)
-red_plot
+
+# set up multipanel par
+par(mfrow=c(2,2),mar=c(0,0,0,0),oma=c(0,0,2,8))
+
+# plot the individual rasters
+red_exc_plot(red_stack[[1]], "Growth - N")
+red_exc_plot(red_stack[[2]], "Survival - N")
+red_exc_plot(red_stack[[3]], "Growth - S")
+red_exc_plot(red_stack[[4]], "Survival - S")
+
+# add in the title
+mtext("Proportion Reduction in:", side = 3, line = -0.5, cex = 1.5, font = 2, outer = TRUE)
+
+# add legend for all plots
+par(mfrow=c(1,1),new=FALSE, oma=c(0,0,0,0), mgp = c(2.5,0.25,0))
+
+legend(
+  x = 1850000,
+  y = 2500000,
+  ncol = 1,
+  
+  # legend colors and sizes
+  legend = rev(red_labels),
+  pch = 22,
+  col = "grey15",
+  pt.bg = rev(red_cols),
+  pt.cex = 5,
+  
+  # title
+  title = "%",
+  title.adj = 0.1,
+  
+  # turn off box
+  bty = "n",
+  
+  #size and location
+  # inset = -.075,
+  # y.intersp = 1,
+  x.intersp = 1.5,
+  cex = 1.2,
+  # text.width = 40,
+  xpd = NA)
+
+
 dev.off()
-
-
-
-
-
-
-
-
-
-
-
 
 
 
