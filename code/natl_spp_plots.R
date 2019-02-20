@@ -34,16 +34,16 @@ library(ComplexHeatmap)
 ## proportion ba in exceedance
 ##-------------
 # Create an empty raster for when there one is not processed via Python
-# s832_n_growth_exc <- raster("test_2/s832_proportion_exc_n_growth.tif")
+# s832_n_growth_exc <- raster("rasters/s832_proportion_exc_n_growth.tif")
 # empty_raster <- reclassify(s832_n_growth_exc, cbind(0, 10, NA))
-# saveRDS(empty_raster, "test_2/empty_raster_exceedance.RDS")
+# saveRDS(empty_raster, "rasters/empty_raster_exceedance.RDS")
 
 # function to check if file exists and read in file; else is empty raster
 read_exc_raster <- function(FILE) {
   if(file.exists(FILE) == TRUE){
     raster(FILE)
   } else {
-    readRDS("test_2/empty_raster_exceedance.RDS")
+    readRDS("rasters/empty_raster_exceedance.RDS")
   }
 }
 
@@ -53,16 +53,16 @@ read_exc_raster <- function(FILE) {
 ##-------------
 
 # # Create an empty raster for when there one is not processed via Python
-# s832_n_growth_red <- raster("test_2/s832_proportion_exc_n_growth_n_growth_reduction.tif")
+# s832_n_growth_red <- raster("rasters/s832_proportion_exc_n_growth_n_growth_reduction.tif")
 # empty_raster <- reclassify(s832_n_growth_red, cbind(0, 10, NA))
-# saveRDS(empty_raster, "test_2/empty_raster_reduction.RDS")
+# saveRDS(empty_raster, "rasters/empty_raster_reduction.RDS")
 
 # function to check if file exists and read in file; else is empty raster
 read_red_raster <- function(FILE) {
   if(file.exists(FILE) == TRUE){
     raster(FILE)
   } else {
-    readRDS("test_2/empty_raster_reduction.RDS")
+    readRDS("rasters/empty_raster_reduction.RDS")
   }
 }
 
@@ -145,8 +145,8 @@ sp_dat <- read_csv("data/spp_codes.csv") %>%
 plot_ba_propba <- function(SP) {
 
   # rasters
-  sp_ba <- raster(paste("test_2/", SP, ".tif", sep = "")) 
-  sp_prop <- raster(paste("test_2/", SP, "_proportion.tif", sep = "")) 
+  sp_ba <- raster(paste("rasters/", SP, ".tif", sep = "")) 
+  sp_prop <- raster(paste("rasters/", SP, "_proportion.tif", sep = "")) 
   
   # plot pars
   ba_cols <- rev(viridis(256))
@@ -292,7 +292,10 @@ plot_ba_propba <- function(SP) {
   rm(sp_prop)
 }
 
-plot_ba_propba("s832")
+
+test_sp <- c("s832", "s93", "s132", "s73", "s901", "s833", "s711", "s263", "s129")
+
+lapply(test_sp, function(x) plot_ba_propba(x))
 
 
 ##-------------
@@ -302,10 +305,10 @@ plot_ba_propba("s832")
 exceedance_plot <- function(SP) {
 
   # rasters
-  sp_n_growth_exc <- read_exc_raster(paste("test_2/", SP, "_proportion_exc_n_growth.tif", sep = ""))              
-  sp_n_survival_exc <- read_exc_raster(paste("test_2/", SP, "_proportion_exc_n_survival.tif", sep = ""))
-  sp_s_growth_exc <- read_exc_raster(paste("test_2/", SP, "_proportion_exc_s_growth.tif", sep = ""))                   
-  sp_s_survival_exc <- read_exc_raster(paste("test_2/", SP, "_proportion_exc_s_survival.tif", sep = ""))
+  sp_n_growth_exc <- read_exc_raster(paste("rasters/", SP, "_proportion_exc_n_growth.tif", sep = ""))              
+  sp_n_survival_exc <- read_exc_raster(paste("rasters/", SP, "_proportion_exc_n_survival.tif", sep = ""))
+  sp_s_growth_exc <- read_exc_raster(paste("rasters/", SP, "_proportion_exc_s_growth.tif", sep = ""))                   
+  sp_s_survival_exc <- read_exc_raster(paste("rasters/", SP, "_proportion_exc_s_survival.tif", sep = ""))
   
   # create a raster stack
   exc_stack <- stack(sp_n_growth_exc,
@@ -372,10 +375,10 @@ exceedance_plot("s832")
 reduction_plot <- function(SP) {
   
   # rasters
-  sp_n_growth_red <- read_red_raster(paste("test_2/", SP, "_proportion_exc_n_growth_n_growth_reduction.tif", sep = ""))
-  sp_n_survival_red <- read_red_raster(paste("test_2/", SP, "_proportion_exc_n_survival_n_survival_reduction.tif", sep = ""))
-  sp_s_growth_red <- read_red_raster(paste("test_2/", SP, "_proportion_exc_s_growth_s_growth_reduction.tif", sep = ""))
-  sp_s_survival_red <- read_red_raster(paste("test_2/", SP, "_proportion_exc_s_survival_s_survival_reduction.tif", sep = ""))
+  sp_n_growth_red <- read_red_raster(paste("rasters/", SP, "_proportion_exc_n_growth_n_growth_reduction.tif", sep = ""))
+  sp_n_survival_red <- read_red_raster(paste("rasters/", SP, "_proportion_exc_n_survival_n_survival_reduction.tif", sep = ""))
+  sp_s_growth_red <- read_red_raster(paste("rasters/", SP, "_proportion_exc_s_growth_s_growth_reduction.tif", sep = ""))
+  sp_s_survival_red <- read_red_raster(paste("rasters/", SP, "_proportion_exc_s_survival_s_survival_reduction.tif", sep = ""))
   
   # stack and name rasters
   red_stack <- stack(sp_n_growth_red,
