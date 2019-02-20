@@ -299,69 +299,70 @@ plot_ba_propba("s832")
 ## exceedance----proportion basal area
 ##-------------
 
-# rasters
-s832_n_growth_exc <- read_exc_raster("test_2/s832_proportion_exc_n_growth.tif")                         
-s832_n_survival_exc <- read_exc_raster("test_2/s832_proportion_exc_n_survival.tif")
-s832_s_growth_exc <- read_exc_raster("test_2/s832_proportion_exc_s_growth.tif")                         
-s832_s_survival_exc <- read_exc_raster("test_2/s832_proportion_exc_s_survival.tif")
+exceedance_plot <- function(SP) {
 
-# create a raster stack
-exc_stack <- stack(s832_n_growth_exc,
-                   s832_n_survival_exc,
-                   s832_s_growth_exc,
-                   s832_s_survival_exc)
+  # rasters
+  sp_n_growth_exc <- read_exc_raster(paste("test_2/", SP, "_proportion_exc_n_growth.tif", sep = ""))              
+  sp_n_survival_exc <- read_exc_raster(paste("test_2/", SP, "_proportion_exc_n_survival.tif", sep = ""))
+  sp_s_growth_exc <- read_exc_raster(paste("test_2/", SP, "_proportion_exc_s_growth.tif", sep = ""))                   
+  sp_s_survival_exc <- read_exc_raster(paste("test_2/", SP, "_proportion_exc_s_survival.tif", sep = ""))
+  
+  # create a raster stack
+  exc_stack <- stack(sp_n_growth_exc,
+                     sp_n_survival_exc,
+                     sp_s_growth_exc,
+                     sp_s_survival_exc)
+  
+  names(exc_stack) <- c("Growth_N",
+                        "Survival_N",
+                        "Growth_S",
+                        "Survival_S")
+  
+  # remove input files
+  rm(sp_n_growth_exc,
+     sp_n_survival_exc,
+     sp_s_growth_exc,
+     sp_s_survival_exc)
+  
+  
+  # color palette and breaks for creating categorical variable
+  exc_cols <- brewer_pal(palette = "YlOrRd")(6)
+  exc_breaks <- c(0, 0.000001, 0.01, 0.05, 0.1, 0.2, 3.5)
+  exc_labels <- c("0", "0-0.01", "0.01-0.05", "0.05-0.1", "0.1-0.2", ">0.2")
+  
+  # create pdf file
+  pdf(file = paste("figures_md/", SP, "_exc.pdf", sep = ""),
+      height = 5,
+      width = 8)
+  
+  # set up multipanel par
+  par(mfrow=c(2,2),mar=c(0,0,0,0),oma=c(0,0,2,4.5), xpd = NA)
+  
+  # plot the individual rasters
+  red_exc_plot(exc_stack[[1]], "Growth - N", exc_cols, exc_breaks )
+  red_exc_plot(exc_stack[[2]], "Survival - N", exc_cols, exc_breaks)
+  red_exc_plot(exc_stack[[3]], "Growth - S", exc_cols, exc_breaks)
+  red_exc_plot(exc_stack[[4]], "Survival - S", exc_cols, exc_breaks)
+  
+  # add in the title
+  mtext("Proportion of Basal Area in Exceedance for:", side = 3, line = 0, cex = 1.2, font = 2, outer = TRUE)
+  
+  # add legend for all plots using COmplexHeatmap::Legend
+  draw(Legend(labels = rev(exc_labels), 
+              title = "%",
+              title_position = "topleft",
+              legend_gp = gpar(fill = rev(exc_cols)), 
+              # gap = unit(5, "mm"),
+              grid_height = unit(8, "mm"), 
+              grid_width = unit(8, "mm"), 
+              ncol = 1),
+       x = unit(7.45, "in"),
+       y = unit(2.6, "in"))
+  
+  dev.off()
+}
 
-names(exc_stack) <- c("Growth_N",
-                      "Survival_N",
-                      "Growth_S",
-                      "Survival_S")
-
-# remove input files
-rm(s832_n_growth_exc,
-   s832_n_survival_exc,
-   s832_s_growth_exc,
-   s832_s_survival_exc)
-
-
-# color palette and breaks for creating categorical variable
-exc_cols <- brewer_pal(palette = "YlOrRd")(6)
-exc_breaks <- c(0, 0.000001, 0.01, 0.05, 0.1, 0.2, 3.5)
-exc_labels <- c("0", "0-0.01", "0.01-0.05", "0.05-0.1", "0.1-0.2", ">0.2")
-
-
-pdf(file = "figures_base/exc_test.pdf",
-    height = 5,
-    width = 8)
-
-# set up multipanel par
-par(mfrow=c(2,2),mar=c(0,0,0,0),oma=c(0,0,2,4.5), xpd = NA)
-
-# plot the individual rasters
-red_exc_plot(exc_stack[[1]], "Growth - N", exc_cols, exc_breaks )
-red_exc_plot(exc_stack[[2]], "Survival - N", exc_cols, exc_breaks)
-red_exc_plot(exc_stack[[3]], "Growth - S", exc_cols, exc_breaks)
-red_exc_plot(exc_stack[[4]], "Survival - S", exc_cols, exc_breaks)
-
-# add in the title
-mtext("Proportion of Basal Area in Exceedance for:", side = 3, line = 0, cex = 1.2, font = 2, outer = TRUE)
-
-# add legend for all plots
-
-# library(ComplexHeatmap)
-# plot.new()
-draw(Legend(labels = rev(exc_labels), 
-            title = "%",
-            title_position = "topleft",
-            legend_gp = gpar(fill = rev(exc_cols)), 
-            # gap = unit(5, "mm"),
-            grid_height = unit(8, "mm"), 
-            grid_width = unit(8, "mm"), 
-            ncol = 1),
-     x = unit(7.45, "in"),
-     y = unit(2.6, "in"))
-
-dev.off()
-
+exceedance_plot("s832")
 
 ##-------------
 ## reduction...look at zlim in raster::plot for same scale
