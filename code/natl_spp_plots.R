@@ -156,7 +156,7 @@ plot_ba_propba <- function(SP) {
   sp_title <- with(sp_dat, paste(GENUS[spp_code == SP], SPECIES[spp_code == SP], sep = " "))
   
   # multipanel plot 
-  pdf(file = paste("figures_md/", SP, "_ba_propba.pdf", sep = ""),
+  pdf(file = paste("figures_md/ba/", SP, "_ba_propba.pdf", sep = ""),
       height = 5,
       width = 10)
   
@@ -331,7 +331,7 @@ exceedance_plot <- function(SP) {
   exc_labels <- c("0", "0-0.01", "0.01-0.05", "0.05-0.1", "0.1-0.2", ">0.2")
   
   # create pdf file
-  pdf(file = paste("figures_md/", SP, "_exc.pdf", sep = ""),
+  pdf(file = paste("figures_md/exc/", SP, "_exc.pdf", sep = ""),
       height = 5,
       width = 8)
   
@@ -365,75 +365,73 @@ exceedance_plot <- function(SP) {
 exceedance_plot("s832")
 
 ##-------------
-## reduction...look at zlim in raster::plot for same scale
+## reduction
 ##-------------
 
-# rasters
 
-s832_n_growth_red <- read_red_raster("test_2/s832_proportion_exc_n_growth_n_growth_reduction.tif")                
-s832_n_survival_red <- read_red_raster("test_2/s832_proportion_exc_n_survival_n_survival_reduction.tif")
-s832_s_growth_red <- read_red_raster("test_2/s832_proportion_exc_s_growth_s_growth_reduction.tif") 
-s832_s_survival_red <- read_red_raster("test_2/s832_proportion_exc_s_survival_s_survival_reduction.tif")
+reduction_plot <- function(SP) {
+  
+  # rasters
+  sp_n_growth_red <- read_red_raster(paste("test_2/", SP, "_proportion_exc_n_growth_n_growth_reduction.tif", sep = ""))
+  sp_n_survival_red <- read_red_raster(paste("test_2/", SP, "_proportion_exc_n_survival_n_survival_reduction.tif", sep = ""))
+  sp_s_growth_red <- read_red_raster(paste("test_2/", SP, "_proportion_exc_s_growth_s_growth_reduction.tif", sep = ""))
+  sp_s_survival_red <- read_red_raster(paste("test_2/", SP, "_proportion_exc_s_survival_s_survival_reduction.tif", sep = ""))
+  
+  # stack and name rasters
+  red_stack <- stack(sp_n_growth_red,
+                     sp_n_survival_red,
+                     sp_s_growth_red,
+                     sp_s_survival_red)
+  
+  names(red_stack) <- c("Growth_N",
+                        "Survival_N",
+                        "Growth_S",
+                        "Survival_S")
+  
+  # remove input files
+  rm(sp_n_growth_red,
+     sp_n_survival_red,
+     sp_s_growth_red,
+     sp_s_survival_red)
+  
+  
+  # color palette and breaks for creating categorical variable
+  red_cols <- rev(brewer_pal(palette = "RdYlBu")(6))
+  red_breaks <- c(0, 0.000001, 0.01, 0.05, 0.1, 0.2, 3.5)
+  red_labels <- c("0", "0-0.01", "0.01-0.05", "0.05-0.1", "0.1-0.2", ">0.2")
+  
+  
+  # multipanel reduction plots
+  pdf(file = paste("figures_md/red/", SP, "_red.pdf", sep = ""),
+      height = 5,
+      width = 8)
+  
+  # set up multipanel par
+  par(mfrow=c(2,2),mar=c(0,0,0,0),oma=c(0,0,2,4.5), xpd = NA)
+  
+  # plot the individual rasters
+  red_exc_plot(red_stack[[1]], "Growth - N", red_cols, red_breaks)
+  red_exc_plot(red_stack[[2]], "Survival - N", red_cols, red_breaks)
+  red_exc_plot(red_stack[[3]], "Growth - S", red_cols, red_breaks)
+  red_exc_plot(red_stack[[4]], "Survival - S", red_cols, red_breaks)
+  
+  # add in the title
+  mtext("Proportion Reduction in:", side = 3, line = 0, cex = 1.2, font = 2, outer = TRUE)
+  
+  # add legend for all plots
+  draw(Legend(labels = rev(red_labels), 
+              title = "%",
+              title_position = "topleft",
+              legend_gp = gpar(fill = rev(red_cols)), 
+              # gap = unit(5, "mm"),
+              grid_height = unit(8, "mm"), 
+              grid_width = unit(8, "mm"), 
+              ncol = 1),
+       x = unit(7.45, "in"),
+       y = unit(2.6, "in"))
+ 
+  dev.off()
+}
 
-# stack and name rasters
-red_stack <- stack(s832_n_growth_red,
-                   s832_n_survival_red,
-                   s832_s_growth_red,
-                   s832_s_survival_red)
-
-names(red_stack) <- c("Growth_N",
-                      "Survival_N",
-                      "Growth_S",
-                      "Survival_S")
-
-# remove input files
-rm(s832_n_growth_red,
-   s832_n_survival_red,
-   s832_s_growth_red,
-   s832_s_survival_red)
-
-
-# color palette and breaks for creating categorical variable
-red_cols <- rev(brewer_pal(palette = "RdYlBu")(6))
-red_breaks <- c(0, 0.000001, 0.01, 0.05, 0.1, 0.2, 3.5)
-red_labels <- c("0", "0-0.01", "0.01-0.05", "0.05-0.1", "0.1-0.2", ">0.2")
-
-
-# multipanel reduction plots
-pdf(file = "figures_base/red_test.pdf",
-    height = 5,
-    width = 8)
-
-# set up multipanel par
-par(mfrow=c(2,2),mar=c(0,0,0,0),oma=c(0,0,2,4.5), xpd = NA)
-
-# plot the individual rasters
-red_exc_plot(red_stack[[1]], "Growth - N", red_cols, red_breaks)
-red_exc_plot(red_stack[[2]], "Survival - N", red_cols, red_breaks)
-red_exc_plot(red_stack[[3]], "Growth - S", red_cols, red_breaks)
-red_exc_plot(red_stack[[4]], "Survival - S", red_cols, red_breaks)
-
-# add in the title
-mtext("Proportion Reduction in:", side = 3, line = 0, cex = 1.2, font = 2, outer = TRUE)
-
-# add legend for all plots
-
-# library(ComplexHeatmap)
-# plot.new()
-draw(Legend(labels = rev(red_labels), 
-            title = "%",
-            title_position = "topleft",
-            legend_gp = gpar(fill = rev(red_cols)), 
-            # gap = unit(5, "mm"),
-            grid_height = unit(8, "mm"), 
-            grid_width = unit(8, "mm"), 
-            ncol = 1),
-     x = unit(7.45, "in"),
-     y = unit(2.6, "in"))
-
-
-dev.off()
-
-
-
+reduction_plot("s832")
 
