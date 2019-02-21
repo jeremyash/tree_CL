@@ -365,8 +365,7 @@ exceedance_plot <- function(SP) {
   dev.off()
 }
 
-exceedance_plot("s832")
-
+lapply(test_sp, function(x) exceedance_plot(x))
 ##-------------
 ## reduction
 ##-------------
@@ -436,5 +435,5 @@ reduction_plot <- function(SP) {
   dev.off()
 }
 
-reduction_plot("s832")
+lapply(test_sp, function(x) reduction_plot(x))
 
