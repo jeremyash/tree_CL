@@ -77,7 +77,7 @@ red_exc_plot <- function(RASTER, TITLE, COLS, BREAKS) {
   plot(forown,
        
        # total pixels to plot
-       # maxpixels = ncell(forown),
+       maxpixels = 1e8,
        
        # turn off plot features
        axes = FALSE,
@@ -90,7 +90,7 @@ red_exc_plot <- function(RASTER, TITLE, COLS, BREAKS) {
   # plot reduction/exceedance raster
   plot(RASTER, 
        # total pixels to plot
-       # maxpixels = ncell(forown),
+       maxpixels = ncell(RASTER),
        axes = FALSE, 
        box = FALSE, 
        col = COLS, 
@@ -126,8 +126,10 @@ states_sh <- readOGR("gis/states")
 states_sh <- spTransform(states_sh, new_crs)
 
 # species codes and data
-sp_dat <- read_csv("data/spp_codes.csv") %>% 
-  rename(spp_code = "spp code") %>% 
+sp_dat <- read_csv("data/spp_codes.csv")
+colnames(sp_dat)[4] <- "spp_code"
+
+sp_dat <- sp_dat %>% 
   mutate(spp_code = paste("s", spp_code, sep = ""))
 
 
@@ -170,7 +172,7 @@ plot_ba_propba <- function(SP) {
   plot(forown,
        
        # total pixels to plot
-       # maxpixels = ncell(forown),
+       maxpixels = 1e8,
        
        # turn off plot features
        axes = FALSE,
@@ -181,6 +183,9 @@ plot_ba_propba <- function(SP) {
        col = c("transparent", "grey85"))
   
   plot(sp_ba,
+       
+       # total pixels to plot
+       maxpixels = 1e8,
        
        #turn off plot features
        axes = FALSE,
@@ -228,7 +233,8 @@ plot_ba_propba <- function(SP) {
   plot(forown,
        
        # total pixels to plot
-       # maxpixels = ncell(forown),
+       # total pixels to plot
+       maxpixels = 1e8,
        
        # turn off plot features
        axes = FALSE,
@@ -239,6 +245,9 @@ plot_ba_propba <- function(SP) {
        col = c("transparent", "grey85"))
   
   plot(sp_prop,
+       
+       # total pixels to plot
+       maxpixels = 1e8,
        
        #turn off plot features
        axes = FALSE,
@@ -436,4 +445,12 @@ reduction_plot <- function(SP) {
 }
 
 lapply(test_sp, function(x) reduction_plot(x))
+
+#----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
+#############################################################################
+## testing
+#############################################################################
+
 
