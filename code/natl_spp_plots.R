@@ -157,8 +157,9 @@ plot_ba_propba <- function(SP) {
   # species title
   sp_title <- with(sp_dat, paste(GENUS[spp_code == SP], SPECIES[spp_code == SP], sep = " "))
   
-  # prop_ba breaks
-  prop_brks <- c(0,0.05,0.15,0.30,0.50, 1)
+  # prop_ba breaks and labels
+  prop_breaks <- c(0,0.05,0.15,0.30,0.50, 1)
+  prop_labels <- c("<5", "5-15", "15-30", "30-50", ">50")
   
   # multipanel plot 
   pdf(file = paste("figures_md/ba/", SP, "_ba_propba.pdf", sep = ""),
@@ -213,7 +214,7 @@ plot_ba_propba <- function(SP) {
        horizontal = FALSE,
        # legend.width = 1.5,
        # cex = 1.2,
-       smallplot = c(0.86,0.90,0.18,0.76),
+       smallplot = c(0.85,0.89,0.18,0.76),
        
        # legend title
        legend.args=list(text=expression(m^2), 
@@ -261,7 +262,7 @@ plot_ba_propba <- function(SP) {
        col = prop_ba_cols,
        
        # breaks
-       breaks = prop_brks,
+       breaks = prop_breaks,
        
        add = TRUE)
   
@@ -269,35 +270,48 @@ plot_ba_propba <- function(SP) {
   plot(states_sh,
        add = TRUE)
   
-  plot(sp_prop,
+  # plot(sp_prop,
+  # 
+  #      # colors
+  #      col = prop_ba_cols,
+  #      
+  #      # breaks
+  #      breaks = prop_brks,
+  #      
+  #      #legend properties
+  #      # legend.shrink = 0.4,
+  #      legend.only = TRUE,
+  #      horizontal = TRUE,
+  #      # legend.width = 1.5,
+  #      # cex = 1.2,
+  #      smallplot = c(0.1,0.9,0.1,0.15),
+  #      
+  #      # legend title
+  #      legend.args=list(text="%", 
+  #                       line = 0.5,
+  #                       side = 2,
+  #                       cex = 1.1,
+  #                       las = 1),
+  #      
+  #      # legend labels
+  #      axis.args = list(cex.axis = 1.1,
+  #                       mgp = c(2.5,0.5,0),
+  #                       tck = -0.25),
+  #      
+  #      add = TRUE)
   
-       # colors
-       col = prop_ba_cols,
-       
-       # breaks
-       breaks = prop_brks,
-       
-       #legend properties
-       # legend.shrink = 0.4,
-       legend.only = TRUE,
-       horizontal = TRUE,
-       # legend.width = 1.5,
-       # cex = 1.2,
-       smallplot = c(0.1,0.9,0.1,0.15),
-       
-       # legend title
-       legend.args=list(text="%", 
-                        line = 0.5,
-                        side = 2,
-                        cex = 1.1,
-                        las = 1),
-       
-       # legend labels
-       axis.args = list(cex.axis = 1.1,
-                        mgp = c(2.5,0.5,0),
-                        tck = -0.25),
-       
-       add = TRUE)
+  # add legend for all plots using COmplexHeatmap::Legend
+  draw(Legend(labels = rev(prop_labels), 
+              title = "%",
+              title_position = "topleft",
+              legend_gp = gpar(fill = rev(prop_ba_cols)), 
+              labels_gp = gpar(fontsize = 12),
+              title_gp = gpar(fontsize = 12),
+              grid_height = unit(14, "mm"), 
+              grid_width = unit(5, "mm"), 
+              ncol = 1),
+       x = unit(9.63, "in"),
+       y = unit(2.275, "in"))
   
   
   title("Proportional Basal Area", line = -5, cex = 0.8)
