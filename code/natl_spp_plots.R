@@ -85,7 +85,7 @@ red_exc_plot <- function(RASTER, TITLE, COLS, BREAKS) {
        legend = FALSE,
        
        # colors
-       col = c("transparent", "grey85"))
+       col = c("grey95", "transparent"))
   
   # plot reduction/exceedance raster
   plot(RASTER, 
@@ -152,17 +152,20 @@ plot_ba_propba <- function(SP) {
   
   # plot pars
   ba_cols <- rev(viridis(256))
-  prop_ba_cols <- rev(magma(256))
+  prop_ba_cols <- c("khaki2", rev(inferno(5))[2:5])
   
   # species title
   sp_title <- with(sp_dat, paste(GENUS[spp_code == SP], SPECIES[spp_code == SP], sep = " "))
+  
+  # prop_ba breaks
+  prop_brks <- c(0,0.05,0.15,0.30,0.50, 1)
   
   # multipanel plot 
   pdf(file = paste("figures_md/ba/", SP, "_ba_propba.pdf", sep = ""),
       height = 5,
       width = 10)
   
-  par(mar = c(0,0,0,0), 
+  par(mar = c(0,0,0,4), 
       mfrow = c(1,2), 
       oma = c(0,0,2,0),
       cex = 0.8)
@@ -172,7 +175,7 @@ plot_ba_propba <- function(SP) {
   plot(forown,
        
        # total pixels to plot
-       maxpixels = 1e8,
+       maxpixels = 1e3,
        
        # turn off plot features
        axes = FALSE,
@@ -185,7 +188,7 @@ plot_ba_propba <- function(SP) {
   plot(sp_ba,
        
        # total pixels to plot
-       maxpixels = 1e8,
+       maxpixels = 1e3,
        
        #turn off plot features
        axes = FALSE,
@@ -207,15 +210,15 @@ plot_ba_propba <- function(SP) {
        #legend properties
        # legend.shrink = 0.4,
        legend.only = TRUE,
-       horizontal = TRUE,
+       horizontal = FALSE,
        # legend.width = 1.5,
        # cex = 1.2,
-       smallplot = c(0.1,0.9,0.1,0.15),
+       smallplot = c(0.86,0.90,0.18,0.76),
        
        # legend title
        legend.args=list(text=expression(m^2), 
-                        line = 0.5,
-                        side = 2,
+                        line = 0.3,
+                        side = 3,
                         cex = 1.1,
                         las = 1),
        
@@ -234,7 +237,7 @@ plot_ba_propba <- function(SP) {
        
        # total pixels to plot
        # total pixels to plot
-       maxpixels = 1e8,
+       maxpixels = 1e3,
        
        # turn off plot features
        axes = FALSE,
@@ -247,7 +250,7 @@ plot_ba_propba <- function(SP) {
   plot(sp_prop,
        
        # total pixels to plot
-       maxpixels = 1e8,
+       maxpixels = 1e3,
        
        #turn off plot features
        axes = FALSE,
@@ -256,6 +259,10 @@ plot_ba_propba <- function(SP) {
        
        # colors
        col = prop_ba_cols,
+       
+       # breaks
+       breaks = prop_brks,
+       
        add = TRUE)
   
   
@@ -266,6 +273,9 @@ plot_ba_propba <- function(SP) {
   
        # colors
        col = prop_ba_cols,
+       
+       # breaks
+       breaks = prop_brks,
        
        #legend properties
        # legend.shrink = 0.4,
@@ -301,10 +311,12 @@ plot_ba_propba <- function(SP) {
   rm(sp_prop)
 }
 
+plot_ba_propba("s901")
 
-test_sp <- c("s832", "s93", "s132", "s73", "s901", "s833", "s711", "s263", "s129")
 
-lapply(test_sp, function(x) plot_ba_propba(x))
+# test_sp <- c("s832", "s93", "s132", "s73", "s901", "s833", "s711", "s263", "s129")
+# 
+# lapply(test_sp, function(x) plot_ba_propba(x))
 
 
 ##-------------
