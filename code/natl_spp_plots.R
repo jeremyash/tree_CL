@@ -31,40 +31,27 @@ library(ComplexHeatmap)
 ########################################
 
 ##-------------
-## proportion ba in exceedance
+## read in exceedance/redcution rasters
 ##-------------
 # Create an empty raster for when there one is not processed via Python
-# s832_n_growth_exc <- raster("rasters/s832_proportion_exc_n_growth.tif")
-# empty_raster <- reclassify(s832_n_growth_exc, cbind(0, 10, NA))
-# saveRDS(empty_raster, "rasters/empty_raster_exceedance.RDS")
+# s832_ba <- raster("rasters/s832.tif")
+# empty_raster <- raster(vals = NA,
+#                        nrows = nrow(s832_ba),
+#                        ncols = ncol(s832_ba),
+#                        ext = extent(s832_ba),
+#                        crs = proj4string(s832_ba))
+# saveRDS(empty_raster, "rasters/empty_raster.RDS")
 
 # function to check if file exists and read in file; else is empty raster
-read_exc_raster <- function(FILE) {
+read_raster <- function(FILE) {
   if(file.exists(FILE) == TRUE){
     raster(FILE)
   } else {
-    readRDS("rasters/empty_raster_exceedance.RDS")
+    # readRDS("rasters/empty_raster_exceedance.RDS")
+    readRDS("rasters/empty_raster.RDS")
   }
 }
 
-
-##-------------
-## reduction
-##-------------
-
-# # Create an empty raster for when there one is not processed via Python
-# s832_n_growth_red <- raster("rasters/s832_proportion_exc_n_growth_n_growth_reduction.tif")
-# empty_raster <- reclassify(s832_n_growth_red, cbind(0, 10, NA))
-# saveRDS(empty_raster, "rasters/empty_raster_reduction.RDS")
-
-# function to check if file exists and read in file; else is empty raster
-read_red_raster <- function(FILE) {
-  if(file.exists(FILE) == TRUE){
-    raster(FILE)
-  } else {
-    readRDS("rasters/empty_raster_reduction.RDS")
-  }
-}
 
 
 ##-------------
@@ -77,7 +64,7 @@ red_exc_plot <- function(RASTER, TITLE, COLS, BREAKS) {
   plot(forown,
        
        # total pixels to plot
-       maxpixels = 1e8,
+       # maxpixels = 1e5,
        
        # turn off plot features
        axes = FALSE,
@@ -85,12 +72,12 @@ red_exc_plot <- function(RASTER, TITLE, COLS, BREAKS) {
        legend = FALSE,
        
        # colors
-       col = c("grey95", "transparent"))
+       col = c("grey85", "transparent"))
   
   # plot reduction/exceedance raster
   plot(RASTER, 
        # total pixels to plot
-       maxpixels = ncell(RASTER),
+       # maxpixels = ncell(RASTER),
        axes = FALSE, 
        box = FALSE, 
        col = COLS, 
@@ -105,9 +92,6 @@ red_exc_plot <- function(RASTER, TITLE, COLS, BREAKS) {
   # add panel title
   title(TITLE, line = -1.5, cex = 0.8)
 }
-
-
-
 
 #----------------------------------------------------------------------------
 
@@ -176,7 +160,7 @@ plot_ba_propba <- function(SP) {
   plot(forown,
        
        # total pixels to plot
-       maxpixels = 1e3,
+       maxpixels = 1e7,
        
        # turn off plot features
        axes = FALSE,
@@ -189,7 +173,7 @@ plot_ba_propba <- function(SP) {
   plot(sp_ba,
        
        # total pixels to plot
-       maxpixels = 1e3,
+       maxpixels = 1e7,
        
        #turn off plot features
        axes = FALSE,
@@ -238,7 +222,7 @@ plot_ba_propba <- function(SP) {
        
        # total pixels to plot
        # total pixels to plot
-       maxpixels = 1e3,
+       maxpixels = 1e7,
        
        # turn off plot features
        axes = FALSE,
@@ -251,7 +235,7 @@ plot_ba_propba <- function(SP) {
   plot(sp_prop,
        
        # total pixels to plot
-       maxpixels = 1e3,
+       maxpixels = 1e7,
        
        #turn off plot features
        axes = FALSE,
@@ -325,12 +309,12 @@ plot_ba_propba <- function(SP) {
   rm(sp_prop)
 }
 
-plot_ba_propba("s901")
+# plot_ba_propba("s901")
 
 
-# test_sp <- c("s832", "s93", "s132", "s73", "s901", "s833", "s711", "s263", "s129")
-# 
-# lapply(test_sp, function(x) plot_ba_propba(x))
+test_sp <- c("s832", "s93", "s132", "s73", "s901", "s833", "s711", "s263", "s129")
+
+lapply(test_sp, function(x) plot_ba_propba(x))
 
 
 ##-------------
@@ -340,10 +324,12 @@ plot_ba_propba("s901")
 exceedance_plot <- function(SP) {
 
   # rasters
-  sp_n_growth_exc <- read_exc_raster(paste("rasters/", SP, "_proportion_exc_n_growth.tif", sep = ""))              
-  sp_n_survival_exc <- read_exc_raster(paste("rasters/", SP, "_proportion_exc_n_survival.tif", sep = ""))
-  sp_s_growth_exc <- read_exc_raster(paste("rasters/", SP, "_proportion_exc_s_growth.tif", sep = ""))                   
-  sp_s_survival_exc <- read_exc_raster(paste("rasters/", SP, "_proportion_exc_s_survival.tif", sep = ""))
+  sp_n_growth_exc <- read_raster(paste("rasters/", SP, "_proportion_exc_n_growth.tif", sep = ""))              
+  sp_n_survival_exc <- read_raster(paste("rasters/", SP, "_proportion_exc_n_survival.tif", sep = ""))
+  sp_s_growth_exc <- read_raster(paste("rasters/", SP, "_proportion_exc_s_growth.tif", sep = ""))                   
+  sp_s_survival_exc <- read_raster(paste("rasters/", SP, "_proportion_exc_s_survival.tif", sep = ""))
+  
+  sp_ba <- raster(paste("rasters/", SP, ".tif", sep = "")) 
   
   # create a raster stack
   exc_stack <- stack(sp_n_growth_exc,
@@ -362,11 +348,15 @@ exceedance_plot <- function(SP) {
      sp_s_growth_exc,
      sp_s_survival_exc)
   
+  # mask the raster stack with the basal area raster and then remove original
+  exc_stack_mask <- mask(exc_stack, sp_ba)
+  rm(exc_stack)
+  
   
   # color palette and breaks for creating categorical variable
   exc_cols <- brewer_pal(palette = "YlOrRd")(6)
   exc_breaks <- c(0, 0.000001, 0.01, 0.05, 0.1, 0.2, 3.5)
-  exc_labels <- c("0", "0-0.01", "0.01-0.05", "0.05-0.1", "0.1-0.2", ">0.2")
+  exc_labels <- c("0", "0-1", "1-5", "5-10", "10-20", ">20")
   
   # create pdf file
   pdf(file = paste("figures_md/exc/", SP, "_exc.pdf", sep = ""),
@@ -377,10 +367,10 @@ exceedance_plot <- function(SP) {
   par(mfrow=c(2,2),mar=c(0,0,0,0),oma=c(0,0,2,4.5), xpd = NA)
   
   # plot the individual rasters
-  red_exc_plot(exc_stack[[1]], "Growth - N", exc_cols, exc_breaks )
-  red_exc_plot(exc_stack[[2]], "Survival - N", exc_cols, exc_breaks)
-  red_exc_plot(exc_stack[[3]], "Growth - S", exc_cols, exc_breaks)
-  red_exc_plot(exc_stack[[4]], "Survival - S", exc_cols, exc_breaks)
+  red_exc_plot(exc_stack_mask[[1]], "Growth - N", exc_cols, exc_breaks )
+  red_exc_plot(exc_stack_mask[[2]], "Survival - N", exc_cols, exc_breaks)
+  red_exc_plot(exc_stack_mask[[3]], "Growth - S", exc_cols, exc_breaks)
+  red_exc_plot(exc_stack_mask[[4]], "Survival - S", exc_cols, exc_breaks)
   
   # add in the title
   mtext("Proportion of Basal Area in Exceedance for:", side = 3, line = 0, cex = 1.2, font = 2, outer = TRUE)
@@ -400,6 +390,8 @@ exceedance_plot <- function(SP) {
   dev.off()
 }
 
+exceedance_plot("s901")
+
 lapply(test_sp, function(x) exceedance_plot(x))
 ##-------------
 ## reduction
@@ -413,6 +405,8 @@ reduction_plot <- function(SP) {
   sp_n_survival_red <- read_red_raster(paste("rasters/", SP, "_proportion_exc_n_survival_n_survival_reduction.tif", sep = ""))
   sp_s_growth_red <- read_red_raster(paste("rasters/", SP, "_proportion_exc_s_growth_s_growth_reduction.tif", sep = ""))
   sp_s_survival_red <- read_red_raster(paste("rasters/", SP, "_proportion_exc_s_survival_s_survival_reduction.tif", sep = ""))
+  
+  sp_ba <- raster(paste("rasters/", SP, ".tif", sep = "")) 
   
   # stack and name rasters
   red_stack <- stack(sp_n_growth_red,
@@ -432,10 +426,14 @@ reduction_plot <- function(SP) {
      sp_s_survival_red)
   
   
+  # mask the raster stack with the basal area raster and then remove original
+  red_stack_mask <- mask(red_stack, sp_ba)
+  rm(red_stack)
+  
   # color palette and breaks for creating categorical variable
   red_cols <- rev(brewer_pal(palette = "RdYlBu")(6))
   red_breaks <- c(0, 0.000001, 0.01, 0.05, 0.1, 0.2, 3.5)
-  red_labels <- c("0", "0-0.01", "0.01-0.05", "0.05-0.1", "0.1-0.2", ">0.2")
+  red_labels <- c("0", "0-1", "1-5", "5-10", "10-20", ">20")
   
   
   # multipanel reduction plots
@@ -447,10 +445,10 @@ reduction_plot <- function(SP) {
   par(mfrow=c(2,2),mar=c(0,0,0,0),oma=c(0,0,2,4.5), xpd = NA)
   
   # plot the individual rasters
-  red_exc_plot(red_stack[[1]], "Growth - N", red_cols, red_breaks)
-  red_exc_plot(red_stack[[2]], "Survival - N", red_cols, red_breaks)
-  red_exc_plot(red_stack[[3]], "Growth - S", red_cols, red_breaks)
-  red_exc_plot(red_stack[[4]], "Survival - S", red_cols, red_breaks)
+  red_exc_plot(red_stack_mask[[1]], "Growth - N", red_cols, red_breaks)
+  red_exc_plot(red_stack_mask[[2]], "Survival - N", red_cols, red_breaks)
+  red_exc_plot(red_stack_mask[[3]], "Growth - S", red_cols, red_breaks)
+  red_exc_plot(red_stack_mask[[4]], "Survival - S", red_cols, red_breaks)
   
   # add in the title
   mtext("Proportion Reduction in:", side = 3, line = 0, cex = 1.2, font = 2, outer = TRUE)
@@ -479,4 +477,69 @@ lapply(test_sp, function(x) reduction_plot(x))
 ## testing
 #############################################################################
 
+# rasters
+sp_n_growth_exc <- read_raster(paste("rasters/", "s711", "_proportion_exc_n_growth.tif", sep = ""))              
+sp_n_survival_exc <- read_raster(paste("rasters/", "s711", "_proportion_exc_n_survival.tif", sep = ""))
+sp_s_growth_exc <- read_raster(paste("rasters/", "s711", "_proportion_exc_s_growth.tif", sep = ""))                   
+sp_s_survival_exc <- read_raster(paste("rasters/", "s711", "_proportion_exc_s_survival.tif", sep = ""))
+
+# create a raster stack
+exc_stack <- stack(sp_n_growth_exc,
+                   sp_n_survival_exc,
+                   sp_s_growth_exc,
+                   sp_s_survival_exc)
+
+names(exc_stack) <- c("Growth_N",
+                      "Survival_N",
+                      "Growth_S",
+                      "Survival_S")
+
+# remove input files
+rm(sp_n_growth_exc,
+   sp_n_survival_exc,
+   sp_s_growth_exc,
+   sp_s_survival_exc)
+
+
+sp_ba <- raster("rasters/s711.tif")
+
+
+system.time(exc_stack_mask <- mask(exc_stack, sp_ba))
+
+
+# color palette and breaks for creating categorical variable
+exc_cols <- brewer_pal(palette = "YlOrRd")(6)
+exc_breaks <- c(0, 0.000001, 0.01, 0.05, 0.1, 0.2, 3.5)
+exc_labels <- c("0", "0-0.01", "0.01-0.05", "0.05-0.1", "0.1-0.2", ">0.2")
+
+# create pdf file
+pdf(file = paste("figures_md/exc/", "s711", "_exc.pdf", sep = ""),
+    height = 5,
+    width = 8)
+
+# set up multipanel par
+par(mfrow=c(2,2),mar=c(0,0,0,0),oma=c(0,0,2,4.5), xpd = NA)
+
+# plot the individual rasters
+red_exc_plot(exc_stack_mask[[1]], "Growth - N", exc_cols, exc_breaks )
+red_exc_plot(exc_stack_mask[[2]], "Survival - N", exc_cols, exc_breaks)
+red_exc_plot(exc_stack_mask[[3]], "Growth - S", exc_cols, exc_breaks)
+red_exc_plot(exc_stack_mask[[4]], "Survival - S", exc_cols, exc_breaks)
+
+# add in the title
+mtext("Proportion of Basal Area in Exceedance of the CL for:", side = 3, line = 0, cex = 1.2, font = 2, outer = TRUE)
+
+# add legend for all plots using COmplexHeatmap::Legend
+draw(Legend(labels = rev(exc_labels), 
+            title = "%",
+            title_position = "topleft",
+            legend_gp = gpar(fill = rev(exc_cols)), 
+            # gap = unit(5, "mm"),
+            grid_height = unit(8, "mm"), 
+            grid_width = unit(8, "mm"), 
+            ncol = 1),
+     x = unit(7.45, "in"),
+     y = unit(2.6, "in"))
+
+dev.off()
 
