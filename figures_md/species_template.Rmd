@@ -1,0 +1,59 @@
+---
+output: pdf_document
+geometry: margin=0.25in 
+params:
+  SPP: x
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r ba_prop, echo=FALSE, out.width = '100%', out.height= '100%', fig.align = 'center'}
+knitr::include_graphics(paste("ba/", params$SPP, "_ba_propba.pdf", sep = ""))
+```
+
+```{r response_curves, echo=FALSE, message=FALSE, out.width = '60%', out.height= '60%', fig.align = 'center'}
+# species codes and data
+sp_dat <- read_csv("raw_data/spp_codes.csv")
+colnames(sp_dat)[4] <- "spp_code"
+sp_dat <- sp_dat %>% 
+  mutate(spp_code = paste("s", spp_code, sep = ""))
+
+
+# file paths for n and s curves
+n_curve <- with(sp_dat, paste("response_curves/n_dep/",
+                              GENUS[spp_code == params$SPP],
+                              " ",
+                              SPECIES[spp_code == params$SPP],
+                              "_spcd_",
+                              str_sub(params$SPP, 2),
+                              "_v13v2_20171218.png",
+                              sep = ""))
+
+s_curve <- with(sp_dat, paste("response_curves/s_dep/",
+                              GENUS[spp_code == params$SPP],
+                              " ",
+                              SPECIES[spp_code == params$SPP],
+                              "_spcd_",
+                               str_sub(params$SPP, 2),
+                              "_v13v2_Sres_20171218.png",
+                              sep = ""))
+
+
+knitr::include_graphics(c(n_curve, s_curve))
+
+
+```
+
+
+
+```{r exc, echo=FALSE, out.width = '100%', out.height = '100%', fig.align = 'center'}
+# exceedance plots
+knitr::include_graphics(paste("exc/", params$SPP, "_exc.pdf", sep = ""))
+```
+
+```{r red, echo=FALSE, out.width = '100%', out.height = '100%', fig.align = 'center'}
+# reduction plots
+knitr::include_graphics(paste("red/", params$SPP, "_red.pdf", sep = ""))
+```
