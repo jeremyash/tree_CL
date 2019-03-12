@@ -33,7 +33,7 @@ library(ComplexHeatmap)
 ##-------------
 ## read in exceedance/redcution rasters
 ##-------------
-# Create an empty raster for when there one is not processed via Python
+# Create an empty raster for when one is not processed via Python
 # s832_ba <- raster("rasters/s832.tif")
 # empty_raster <- raster(vals = NA,
 #                        nrows = nrow(s832_ba),
@@ -55,7 +55,7 @@ read_raster <- function(FILE) {
 
 
 ##-------------
-## plotting function for red/exc rasters
+## plotting function for reduction/exceedance rasters
 ##-------------
 
 red_exc_plot <- function(RASTER, TITLE, COLS, BREAKS) {
@@ -78,11 +78,16 @@ red_exc_plot <- function(RASTER, TITLE, COLS, BREAKS) {
   plot(RASTER, 
        # total pixels to plot
        # maxpixels = ncell(RASTER),
+       
+       # turn off plot features
        axes = FALSE, 
        box = FALSE, 
+       legend = FALSE,
+       
+       # colors and bins
        col = COLS, 
        breaks = BREAKS, 
-       legend = FALSE,
+      
        add = TRUE)
   
   # plot states
@@ -94,7 +99,6 @@ red_exc_plot <- function(RASTER, TITLE, COLS, BREAKS) {
 }
 
 #----------------------------------------------------------------------------
-
 
 
 ########################################
@@ -139,7 +143,11 @@ plot_ba_propba <- function(SP) {
   prop_ba_cols <- c("khaki2", rev(inferno(5))[2:5])
   
   # species title
-  sp_title <- with(sp_dat, paste(GENUS[spp_code == SP], SPECIES[spp_code == SP], sep = " "))
+  sp_latin <- with(sp_dat, paste(GENUS[spp_code == SP], 
+                                 SPECIES[spp_code == SP], 
+                                 sep = " "))
+  
+  sp_common <- with(sp_dat, COMMON_NAME[spp_code == SP])
   
   # prop_ba breaks and labels
   prop_breaks <- c(0,0.05,0.15,0.30,0.50, 1)
@@ -160,7 +168,7 @@ plot_ba_propba <- function(SP) {
   plot(forown,
        
        # total pixels to plot
-       maxpixels = 1e7,
+       # maxpixels = 1e7,
        
        # turn off plot features
        axes = FALSE,
@@ -168,12 +176,12 @@ plot_ba_propba <- function(SP) {
        legend = FALSE,
        
        # colors
-       col = c("transparent", "grey85"))
+       col = c("grey85", "transparent" ))
   
   plot(sp_ba,
        
        # total pixels to plot
-       maxpixels = 1e7,
+       # maxpixels = 1e7,
        
        #turn off plot features
        axes = FALSE,
@@ -215,14 +223,13 @@ plot_ba_propba <- function(SP) {
        add = TRUE)
   
   
-  title("Basal Area", line = -5, cex = 0.8)
+  title("Basal Area", line = -5, cex = 1)
   
   # proportional basal area
   plot(forown,
        
        # total pixels to plot
-       # total pixels to plot
-       maxpixels = 1e7,
+       # maxpixels = 1e7,
        
        # turn off plot features
        axes = FALSE,
@@ -230,12 +237,12 @@ plot_ba_propba <- function(SP) {
        legend = FALSE,
        
        # colors
-       col = c("transparent", "grey85"))
+       col = c("grey85", "transparent"))
   
   plot(sp_prop,
        
        # total pixels to plot
-       maxpixels = 1e7,
+       # maxpixels = 1e7,
        
        #turn off plot features
        axes = FALSE,
@@ -253,38 +260,9 @@ plot_ba_propba <- function(SP) {
   
   plot(states_sh,
        add = TRUE)
+
   
-  # plot(sp_prop,
-  # 
-  #      # colors
-  #      col = prop_ba_cols,
-  #      
-  #      # breaks
-  #      breaks = prop_brks,
-  #      
-  #      #legend properties
-  #      # legend.shrink = 0.4,
-  #      legend.only = TRUE,
-  #      horizontal = TRUE,
-  #      # legend.width = 1.5,
-  #      # cex = 1.2,
-  #      smallplot = c(0.1,0.9,0.1,0.15),
-  #      
-  #      # legend title
-  #      legend.args=list(text="%", 
-  #                       line = 0.5,
-  #                       side = 2,
-  #                       cex = 1.1,
-  #                       las = 1),
-  #      
-  #      # legend labels
-  #      axis.args = list(cex.axis = 1.1,
-  #                       mgp = c(2.5,0.5,0),
-  #                       tck = -0.25),
-  #      
-  #      add = TRUE)
-  
-  # add legend for all plots using COmplexHeatmap::Legend
+  # add legend for prop_ba using COmplexHeatmap::Legend
   draw(Legend(labels = rev(prop_labels), 
               title = "%",
               title_position = "topleft",
@@ -294,14 +272,28 @@ plot_ba_propba <- function(SP) {
               grid_height = unit(14, "mm"), 
               grid_width = unit(5, "mm"), 
               ncol = 1),
-       x = unit(9.63, "in"),
+       x = unit(9.59, "in"),
        y = unit(2.275, "in"))
   
-  
-  title("Proportional Basal Area", line = -5, cex = 0.8)
+  title("Proportional Basal Area", line = -5, cex = 1)
   
   # species title
-  mtext(sp_title, side = 3, line = -0.5, cex = 2, font = 3, outer = TRUE)
+  mtext(bquote(italic(.(sp_latin))~"("*.(sp_common)*")"),
+        side = 3, line = -0.5, cex = 2, font = 3, outer = TRUE)
+  
+  # NLCD legend
+  draw(Legend(labels = c("Forested", "Non-forested"), 
+              title = ,
+              title_position = "topleft",
+              legend_gp = gpar(fill = c("grey85", "White")),
+              border = "grey15", 
+              ncol = 2,
+              labels_gp = gpar(fontsize = 14),
+              title_gp = gpar(fontsize = 12),
+              grid_height = unit(8, "mm"), 
+              grid_width = unit(8, "mm")),
+       x = unit(5, "in"),
+       y = unit(0.5, "in"))
   dev.off()
   
   # remove files
@@ -309,12 +301,14 @@ plot_ba_propba <- function(SP) {
   rm(sp_prop)
 }
 
-# plot_ba_propba("s901")
 
-
+# id test species 
 test_sp <- c("s832", "s93", "s132", "s73", "s901", "s833", "s711", "s263", "s129")
 
+# generate pdfs of plots
 lapply(test_sp, function(x) plot_ba_propba(x))
+
+
 
 
 ##-------------
@@ -329,6 +323,7 @@ exceedance_plot <- function(SP) {
   sp_s_growth_exc <- read_raster(paste("rasters/", SP, "_proportion_exc_s_growth.tif", sep = ""))                   
   sp_s_survival_exc <- read_raster(paste("rasters/", SP, "_proportion_exc_s_survival.tif", sep = ""))
   
+  # basal area for mask
   sp_ba <- raster(paste("rasters/", SP, ".tif", sep = "")) 
   
   # create a raster stack
@@ -354,7 +349,7 @@ exceedance_plot <- function(SP) {
   
   
   # color palette and breaks for creating categorical variable
-  exc_cols <- brewer_pal(palette = "YlOrRd")(6)
+  exc_cols <- c("grey25", brewer_pal(palette = "YlOrRd")(6)[2:6])
   exc_breaks <- c(0, 0.000001, 0.01, 0.05, 0.1, 0.2, 3.5)
   exc_labels <- c("0", "0-1", "1-5", "5-10", "10-20", ">20")
   
@@ -373,7 +368,7 @@ exceedance_plot <- function(SP) {
   red_exc_plot(exc_stack_mask[[4]], "Survival - S", exc_cols, exc_breaks)
   
   # add in the title
-  mtext("Proportion of Basal Area in Exceedance for:", side = 3, line = 0, cex = 1.2, font = 2, outer = TRUE)
+  mtext("Percent of Basal Area in Exceedance of Critical Load for:", side = 3, line = 0, cex = 1.2, font = 2, outer = TRUE)
   
   # add legend for all plots using COmplexHeatmap::Legend
   draw(Legend(labels = rev(exc_labels), 
@@ -390,9 +385,13 @@ exceedance_plot <- function(SP) {
   dev.off()
 }
 
-exceedance_plot("s901")
 
 lapply(test_sp, function(x) exceedance_plot(x))
+
+
+
+
+
 ##-------------
 ## reduction
 ##-------------
@@ -401,11 +400,12 @@ lapply(test_sp, function(x) exceedance_plot(x))
 reduction_plot <- function(SP) {
   
   # rasters
-  sp_n_growth_red <- read_red_raster(paste("rasters/", SP, "_proportion_exc_n_growth_n_growth_reduction.tif", sep = ""))
-  sp_n_survival_red <- read_red_raster(paste("rasters/", SP, "_proportion_exc_n_survival_n_survival_reduction.tif", sep = ""))
-  sp_s_growth_red <- read_red_raster(paste("rasters/", SP, "_proportion_exc_s_growth_s_growth_reduction.tif", sep = ""))
-  sp_s_survival_red <- read_red_raster(paste("rasters/", SP, "_proportion_exc_s_survival_s_survival_reduction.tif", sep = ""))
+  sp_n_growth_red <- read_raster(paste("rasters/", SP, "_proportion_exc_n_growth_n_growth_reduction.tif", sep = ""))
+  sp_n_survival_red <- read_raster(paste("rasters/", SP, "_proportion_exc_n_survival_n_survival_reduction.tif", sep = ""))
+  sp_s_growth_red <- read_raster(paste("rasters/", SP, "_proportion_exc_s_growth_s_growth_reduction.tif", sep = ""))
+  sp_s_survival_red <- read_raster(paste("rasters/", SP, "_proportion_exc_s_survival_s_survival_reduction.tif", sep = ""))
   
+  # basal area raster for mask
   sp_ba <- raster(paste("rasters/", SP, ".tif", sep = "")) 
   
   # stack and name rasters
@@ -431,7 +431,7 @@ reduction_plot <- function(SP) {
   rm(red_stack)
   
   # color palette and breaks for creating categorical variable
-  red_cols <- rev(brewer_pal(palette = "RdYlBu")(6))
+  red_cols <- c("grey25", brewer_pal(palette = "YlOrRd")(6)[2:6])
   red_breaks <- c(0, 0.000001, 0.01, 0.05, 0.1, 0.2, 3.5)
   red_labels <- c("0", "0-1", "1-5", "5-10", "10-20", ">20")
   
@@ -451,7 +451,7 @@ reduction_plot <- function(SP) {
   red_exc_plot(red_stack_mask[[4]], "Survival - S", red_cols, red_breaks)
   
   # add in the title
-  mtext("Proportion Reduction in:", side = 3, line = 0, cex = 1.2, font = 2, outer = TRUE)
+  mtext("Percent Reduction in:", side = 3, line = 0, cex = 1.2, font = 2, outer = TRUE)
   
   # add legend for all plots
   draw(Legend(labels = rev(red_labels), 
@@ -476,70 +476,3 @@ lapply(test_sp, function(x) reduction_plot(x))
 #############################################################################
 ## testing
 #############################################################################
-
-# rasters
-sp_n_growth_exc <- read_raster(paste("rasters/", "s711", "_proportion_exc_n_growth.tif", sep = ""))              
-sp_n_survival_exc <- read_raster(paste("rasters/", "s711", "_proportion_exc_n_survival.tif", sep = ""))
-sp_s_growth_exc <- read_raster(paste("rasters/", "s711", "_proportion_exc_s_growth.tif", sep = ""))                   
-sp_s_survival_exc <- read_raster(paste("rasters/", "s711", "_proportion_exc_s_survival.tif", sep = ""))
-
-# create a raster stack
-exc_stack <- stack(sp_n_growth_exc,
-                   sp_n_survival_exc,
-                   sp_s_growth_exc,
-                   sp_s_survival_exc)
-
-names(exc_stack) <- c("Growth_N",
-                      "Survival_N",
-                      "Growth_S",
-                      "Survival_S")
-
-# remove input files
-rm(sp_n_growth_exc,
-   sp_n_survival_exc,
-   sp_s_growth_exc,
-   sp_s_survival_exc)
-
-
-sp_ba <- raster("rasters/s711.tif")
-
-
-system.time(exc_stack_mask <- mask(exc_stack, sp_ba))
-
-
-# color palette and breaks for creating categorical variable
-exc_cols <- brewer_pal(palette = "YlOrRd")(6)
-exc_breaks <- c(0, 0.000001, 0.01, 0.05, 0.1, 0.2, 3.5)
-exc_labels <- c("0", "0-0.01", "0.01-0.05", "0.05-0.1", "0.1-0.2", ">0.2")
-
-# create pdf file
-pdf(file = paste("figures_md/exc/", "s711", "_exc.pdf", sep = ""),
-    height = 5,
-    width = 8)
-
-# set up multipanel par
-par(mfrow=c(2,2),mar=c(0,0,0,0),oma=c(0,0,2,4.5), xpd = NA)
-
-# plot the individual rasters
-red_exc_plot(exc_stack_mask[[1]], "Growth - N", exc_cols, exc_breaks )
-red_exc_plot(exc_stack_mask[[2]], "Survival - N", exc_cols, exc_breaks)
-red_exc_plot(exc_stack_mask[[3]], "Growth - S", exc_cols, exc_breaks)
-red_exc_plot(exc_stack_mask[[4]], "Survival - S", exc_cols, exc_breaks)
-
-# add in the title
-mtext("Proportion of Basal Area in Exceedance of the CL for:", side = 3, line = 0, cex = 1.2, font = 2, outer = TRUE)
-
-# add legend for all plots using COmplexHeatmap::Legend
-draw(Legend(labels = rev(exc_labels), 
-            title = "%",
-            title_position = "topleft",
-            legend_gp = gpar(fill = rev(exc_cols)), 
-            # gap = unit(5, "mm"),
-            grid_height = unit(8, "mm"), 
-            grid_width = unit(8, "mm"), 
-            ncol = 1),
-     x = unit(7.45, "in"),
-     y = unit(2.6, "in"))
-
-dev.off()
-
