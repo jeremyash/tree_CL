@@ -7,13 +7,42 @@ params:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+## SPATIAL
+library(sp)
+library(rgeos)
+library(raster)
+library(rgdal)
+library(maptools)
+library(sf)
+
+## DATA MANAGEMENT
+library(tidyverse)
+library(skimr)
+library(patchwork)
+library(readxl)
+# library(zoo)
+
+## PLOTTING
+library(scales)
+library(units)
+library(viridis)
+library(extrafont)
+library(gtable)
+library(grid)
+library(gridExtra)
+
+## MARKDOWN
+library(kableExtra)
+library(png)
+#----------------------------------------------------------------------------
 ```
 
-```{r ba_prop, echo=FALSE, out.width = '100%', out.height= '100%', fig.align = 'center'}
+```{r ba_prop, echo=FALSE, out.width = '100%', out.height= '100%', fig.align = 'left'}
 knitr::include_graphics(paste("ba/", params$SPP, "_ba_propba.pdf", sep = ""))
 ```
 
-```{r response_curves, echo=FALSE, message=FALSE, out.width = '60%', out.height= '60%', fig.align = 'center'}
+
+```{r response_curves, echo=FALSE, message=FALSE, out.width = '100%', out.height= '100%', fig.align = 'left'}
 # species codes and data
 sp_dat <- read_csv("raw_data/spp_codes.csv")
 colnames(sp_dat)[4] <- "spp_code"
@@ -41,7 +70,22 @@ s_curve <- with(sp_dat, paste("response_curves/s_dep/",
                               sep = ""))
 
 
-knitr::include_graphics(c(n_curve, s_curve))
+# species stats table
+sp_tab <- tibble(Statistic = c("Basal area (avg)", "Proportion basal area (avg)", "Critical Loads", "Percent BA in exceedance", "Percent reduction", "Fraction of basal area at risk", "Correlations", "Wilson Diagnostics"),
+                 Value = rep("-", 8))
+
+# convert table to grob
+tt1 <- ttheme_default()
+sp_tab_grob <- tableGrob(sp_tab, rows = NULL, theme=tt1)
+
+# read in species response curves and convert to grobs
+n_grob <-  grid::rasterGrob(as.raster(readPNG(n_curve)),
+                            interpolate = FALSE)
+s_grob <-  grid::rasterGrob(as.raster(readPNG(s_curve)),
+                            interpolate = FALSE)
+
+# arrange all together
+grid.arrange(arrangeGrob(n_grob, s_grob, nrow = 2), sp_tab_grob, ncol = 2, heights = c(10, 1))
 
 
 ```
