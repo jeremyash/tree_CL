@@ -72,7 +72,7 @@ red_exc_plot <- function(RASTER, TITLE, COLS, BREAKS) {
        legend = FALSE,
        
        # colors
-       col = c("grey85", "transparent"))
+       col = c("grey70", "transparent"))
   
   # plot reduction/exceedance raster
   plot(RASTER, 
@@ -140,7 +140,7 @@ plot_ba_propba <- function(SP) {
   
   # plot pars
   ba_cols <- rev(viridis(256))
-  prop_ba_cols <- c("khaki2", rev(inferno(5))[2:5])
+  prop_ba_cols <- c("khaki2", rev(inferno(6))[2:6])
   
   # species title
   sp_latin <- with(sp_dat, paste(GENUS[spp_code == SP], 
@@ -150,8 +150,8 @@ plot_ba_propba <- function(SP) {
   sp_common <- with(sp_dat, COMMON_NAME[spp_code == SP])
   
   # prop_ba breaks and labels
-  prop_breaks <- c(0,0.05,0.15,0.30,0.50, 1)
-  prop_labels <- c("<5", "5-15", "15-30", "30-50", ">50")
+  prop_breaks <- c(0,0.05,0.10,0.20,0.40, 0.60, 1)
+  prop_labels <- c("<5", "5-10", "10-20", "20-40", "40-60", ">60")
   
   # multipanel plot 
   pdf(file = paste("figures_md/ba/", SP, "_ba_propba.pdf", sep = ""),
@@ -176,7 +176,7 @@ plot_ba_propba <- function(SP) {
        legend = FALSE,
        
        # colors
-       col = c("grey85", "transparent" ))
+       col = c("grey70", "transparent" ))
   
   plot(sp_ba,
        
@@ -237,7 +237,7 @@ plot_ba_propba <- function(SP) {
        legend = FALSE,
        
        # colors
-       col = c("grey85", "transparent"))
+       col = c("grey70", "transparent"))
   
   plot(sp_prop,
        
@@ -269,7 +269,7 @@ plot_ba_propba <- function(SP) {
               legend_gp = gpar(fill = rev(prop_ba_cols)), 
               labels_gp = gpar(fontsize = 12),
               title_gp = gpar(fontsize = 12),
-              grid_height = unit(14, "mm"), 
+              grid_height = unit(12, "mm"), 
               grid_width = unit(5, "mm"), 
               ncol = 1),
        x = unit(9.59, "in"),
@@ -285,7 +285,7 @@ plot_ba_propba <- function(SP) {
   draw(Legend(labels = c("Forested", "Non-forested"), 
               title = ,
               title_position = "topleft",
-              legend_gp = gpar(fill = c("grey85", "White")),
+              legend_gp = gpar(fill = c("grey70", "White")),
               border = "grey15", 
               ncol = 2,
               labels_gp = gpar(fontsize = 14),
@@ -307,9 +307,6 @@ test_sp <- c("s832", "s93", "s132", "s73", "s901", "s833", "s711", "s263", "s129
 
 # generate pdfs of plots
 lapply(test_sp, function(x) plot_ba_propba(x))
-
-
-
 
 ##-------------
 ## exceedance----proportion basal area
@@ -349,7 +346,7 @@ exceedance_plot <- function(SP) {
   
   
   # color palette and breaks for creating categorical variable
-  exc_cols <- c("grey25", brewer_pal(palette = "YlOrRd")(6)[2:6])
+  exc_cols <- c("steelblue3", brewer_pal(palette = "YlOrRd")(6)[2:6])
   exc_breaks <- c(0, 0.000001, 0.01, 0.05, 0.1, 0.2, 3.5)
   exc_labels <- c("0", "0-1", "1-5", "5-10", "10-20", ">20")
   
@@ -362,10 +359,10 @@ exceedance_plot <- function(SP) {
   par(mfrow=c(2,2),mar=c(0,0,0,0),oma=c(0,0,2,4.5), xpd = NA)
   
   # plot the individual rasters
-  red_exc_plot(exc_stack_mask[[1]], "Growth - N", exc_cols, exc_breaks )
-  red_exc_plot(exc_stack_mask[[2]], "Survival - N", exc_cols, exc_breaks)
-  red_exc_plot(exc_stack_mask[[3]], "Growth - S", exc_cols, exc_breaks)
-  red_exc_plot(exc_stack_mask[[4]], "Survival - S", exc_cols, exc_breaks)
+  red_exc_plot(exc_stack_mask[[1]], "Growth - N Deposition", exc_cols, exc_breaks )
+  red_exc_plot(exc_stack_mask[[2]], "Survival - N Deposition", exc_cols, exc_breaks)
+  red_exc_plot(exc_stack_mask[[3]], "Growth - S Deposition", exc_cols, exc_breaks)
+  red_exc_plot(exc_stack_mask[[4]], "Survival - S Deposition", exc_cols, exc_breaks)
   
   # add in the title
   mtext("Percent of Basal Area in Exceedance of Critical Load for:", side = 3, line = 0, cex = 1.2, font = 2, outer = TRUE)
@@ -431,7 +428,7 @@ reduction_plot <- function(SP) {
   rm(red_stack)
   
   # color palette and breaks for creating categorical variable
-  red_cols <- c("grey25", brewer_pal(palette = "YlOrRd")(6)[2:6])
+  red_cols <- c("steelblue3", brewer_pal(palette = "YlOrRd")(6)[2:6])
   red_breaks <- c(0, 0.000001, 0.01, 0.05, 0.1, 0.2, 3.5)
   red_labels <- c("0", "0-1", "1-5", "5-10", "10-20", ">20")
   
@@ -445,10 +442,10 @@ reduction_plot <- function(SP) {
   par(mfrow=c(2,2),mar=c(0,0,0,0),oma=c(0,0,2,4.5), xpd = NA)
   
   # plot the individual rasters
-  red_exc_plot(red_stack_mask[[1]], "Growth - N", red_cols, red_breaks)
-  red_exc_plot(red_stack_mask[[2]], "Survival - N", red_cols, red_breaks)
-  red_exc_plot(red_stack_mask[[3]], "Growth - S", red_cols, red_breaks)
-  red_exc_plot(red_stack_mask[[4]], "Survival - S", red_cols, red_breaks)
+  red_exc_plot(red_stack_mask[[1]], "Growth - N Deposition", red_cols, red_breaks)
+  red_exc_plot(red_stack_mask[[2]], "Survival - N Deposition", red_cols, red_breaks)
+  red_exc_plot(red_stack_mask[[3]], "Growth - S Deposition", red_cols, red_breaks)
+  red_exc_plot(red_stack_mask[[4]], "Survival - S Deposition", red_cols, red_breaks)
   
   # add in the title
   mtext("Percent Reduction in:", side = 3, line = 0, cex = 1.2, font = 2, outer = TRUE)
