@@ -61,19 +61,19 @@ read_raster <- function(FILE) {
 red_exc_plot <- function(RASTER, TITLE, COLS, BREAKS) {
   
   # forest ownership
-  plot(forown,
-       
-       # total pixels to plot
-       # maxpixels = 1e5,
-       
-       # turn off plot features
-       axes = FALSE,
-       box = FALSE,
-       legend = FALSE,
-       
-       # colors
-       col = c("grey70", "transparent"))
-  
+  # plot(forown,
+  #      
+  #      # total pixels to plot
+  #      # maxpixels = 1e5,
+  #      
+  #      # turn off plot features
+  #      axes = FALSE,
+  #      box = FALSE,
+  #      legend = FALSE,
+  #      
+  #      # colors
+  #      col = c("grey70", "transparent"))
+  # 
   # plot reduction/exceedance raster
   plot(RASTER, 
        # total pixels to plot
@@ -86,9 +86,7 @@ red_exc_plot <- function(RASTER, TITLE, COLS, BREAKS) {
        
        # colors and bins
        col = COLS, 
-       breaks = BREAKS, 
-      
-       add = TRUE)
+       breaks = BREAKS)
   
   # plot states
   plot(states_sh,
